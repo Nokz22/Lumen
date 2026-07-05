@@ -1,0 +1,95 @@
+# ==========================================================================
+# Lumen — .gitignore (monorepo: backend Java/Spring Boot + frontend React/Vite)
+# ==========================================================================
+
+# ------------------------------------------------------------------ Secrets
+# Nunca versionar segredos. Apenas .env.example (esse SIM entra no repo).
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.keystore
+secrets/
+application-local.yml
+application-local.yaml
+application-local.properties
+
+# --------------------------------------------------------- Java / Gradle
+# Backend
+backend/build/
+backend/.gradle/
+build/
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/**/build/
+out/
+bin/
+*.class
+*.log
+*.jar
+!gradle-wrapper.jar
+!**/libs/*.jar
+hs_err_pid*
+replay_pid*
+
+# Testcontainers / relatórios de teste e cobertura
+**/test-results/
+**/jacoco/
+*.exec
+
+# ------------------------------------------------------- Node / React / Vite
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/.vite/
+node_modules/
+dist/
+dist-ssr/
+.vite/
+coverage/
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.eslintcache
+
+# --------------------------------------------------------------------- IDEs
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+# VS Code (mantém apenas partilháveis se quiseres; por defeito ignora tudo)
+.vscode/
+# Eclipse / NetBeans
+.classpath
+.project
+.settings/
+nbproject/
+
+# --------------------------------------------------------------- Docker
+# Overrides locais de compose (o docker-compose.yml base ENTRA no repo)
+docker-compose.override.yml
+docker-compose.override.yaml
+
+# ---------------------------------------------------------- Sistema operativo
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# ------------------------------------------------------------------ Diversos
+*.tmp
+*.bak
+*.swp
+*~
+logs/
+*.pid
