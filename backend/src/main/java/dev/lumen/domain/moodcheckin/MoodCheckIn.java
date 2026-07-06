@@ -2,6 +2,7 @@ package dev.lumen.domain.moodcheckin;
 
 import dev.lumen.domain.user.User;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -44,7 +45,8 @@ public class MoodCheckIn {
     @Column(name = "sleep_quality", nullable = false)
     private int sleepQuality;
 
-    @Column(length = 1000)
+    @Convert(converter = EncryptedStringConverter.class)
+    @Column(length = 2000)
     private String note;
 
     @Column(name = "check_in_date", nullable = false)

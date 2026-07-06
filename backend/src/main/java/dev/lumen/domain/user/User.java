@@ -2,10 +2,13 @@ package dev.lumen.domain.user;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
@@ -18,6 +21,9 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(name = "password_hash", nullable = false)
+    private String passwordHash;
+
     @Column(name = "display_name", nullable = false)
     private String displayName;
 
@@ -26,6 +32,13 @@ public class User {
 
     @Column(nullable = false)
     private String region;
+
+    @Column(name = "date_of_birth", nullable = false)
+    private LocalDate dateOfBirth;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
@@ -36,12 +49,22 @@ public class User {
     protected User() {
     }
 
-    public User(String email, String displayName, String locale, String region) {
+    public User(
+            String email,
+            String passwordHash,
+            String displayName,
+            String locale,
+            String region,
+            LocalDate dateOfBirth,
+            Role role) {
         this.id = UUID.randomUUID();
         this.email = email;
+        this.passwordHash = passwordHash;
         this.displayName = displayName;
         this.locale = locale;
         this.region = region;
+        this.dateOfBirth = dateOfBirth;
+        this.role = role;
         this.createdAt = Instant.now();
     }
 
@@ -51,6 +74,10 @@ public class User {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
     }
 
     public String getDisplayName() {
@@ -63,6 +90,14 @@ public class User {
 
     public String getRegion() {
         return region;
+    }
+
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public Role getRole() {
+        return role;
     }
 
     public Instant getCreatedAt() {

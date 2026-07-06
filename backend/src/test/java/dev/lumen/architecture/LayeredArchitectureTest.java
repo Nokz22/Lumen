@@ -58,6 +58,12 @@ class LayeredArchitectureTest {
             .onlyBeAccessed()
             .byAnyPackage("..domain..", "..application..", "..infrastructure..");
 
+    /**
+     * "Configuration" (the {@code config} package) is the Spring composition root — the
+     * one legitimate place that wires Infrastructure components (e.g. a security filter)
+     * together with Application services. It is deliberately given broader access than
+     * any business layer; nothing may depend on it.
+     */
     @ArchTest
     static final ArchRule LAYERED_ARCHITECTURE = Architectures.layeredArchitecture()
             .consideringAllDependencies()
@@ -69,12 +75,16 @@ class LayeredArchitectureTest {
             .definedBy("..domain..")
             .layer("Infrastructure")
             .definedBy("..infrastructure..")
+            .layer("Configuration")
+            .definedBy("..config..")
             .whereLayer("Presentation")
             .mayNotBeAccessedByAnyLayer()
             .whereLayer("Application")
-            .mayOnlyBeAccessedByLayers("Presentation")
+            .mayOnlyBeAccessedByLayers("Presentation", "Infrastructure", "Configuration")
             .whereLayer("Domain")
-            .mayOnlyBeAccessedByLayers("Presentation", "Application", "Infrastructure")
+            .mayOnlyBeAccessedByLayers("Presentation", "Application", "Infrastructure", "Configuration")
             .whereLayer("Infrastructure")
+            .mayOnlyBeAccessedByLayers("Configuration")
+            .whereLayer("Configuration")
             .mayNotBeAccessedByAnyLayer();
 }

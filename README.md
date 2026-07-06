@@ -71,9 +71,9 @@ npm install
 npm run dev
 ```
 
-Sem autenticação ainda (Fase 2): o check-in usa um **utilizador de demonstração** com
-UUID fixo `11111111-1111-1111-1111-111111111111`, semeado por
-`db/dev-seed/V3__seed_demo_user.sql` (só no perfil `dev`).
+Regista uma conta em `/register`, ou usa o **utilizador de demonstração** já semeado
+(perfil `dev`): `demo@lumen.dev` / `Demo1234!` — já tem consentimento de dados de saúde
+concedido, por isso já consegue fazer check-in imediatamente após login.
 
 ## Variáveis de ambiente
 
@@ -103,12 +103,13 @@ docs/       project-brief, standards, ADRs, diagramas
 - [`docs/adr/`](docs/adr/) — Architecture Decision Records.
 - [`docs/glossary.md`](docs/glossary.md) — linguagem única partilhada entre código, API e UI.
 - [`docs/diagrams/domain-model-phase1.md`](docs/diagrams/domain-model-phase1.md) — modelo de domínio (Mermaid).
+- [`docs/threat-model.md`](docs/threat-model.md) — ativo → ameaça → mitigação.
 
 ## Roadmap (fases)
 
 - [x] **Fase 0** — Fundações + fronteira ética
 - [x] **Fase 1** — Domínio + check-in diário + dashboard base
-- [ ] Fase 2 — Autenticação, roles e base de RGPD
+- [x] **Fase 2** — Autenticação, roles e base de RGPD
 - [ ] Fase 3 — Instrumentos + fluxo de crise
 - [ ] Fase 4 — Motor de recomendação + biblioteca de exercícios
 - [ ] Fase 5 — Ingestão de wearable (provider-agnostic)
