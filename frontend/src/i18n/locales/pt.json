@@ -34,5 +34,36 @@
   "language": {
     "en": "EN",
     "pt": "PT"
+  },
+  "auth": {
+    "login": {
+      "title": "Iniciar sessão",
+      "emailLabel": "Email",
+      "passwordLabel": "Palavra-passe",
+      "submit": "Iniciar sessão",
+      "error": "Email ou palavra-passe inválidos.",
+      "noAccount": "Ainda não tens conta?",
+      "registerLink": "Cria uma"
+    },
+    "register": {
+      "title": "Cria a tua conta",
+      "emailLabel": "Email",
+      "passwordLabel": "Palavra-passe",
+      "displayNameLabel": "Nome",
+      "regionLabel": "Região",
+      "dateOfBirthLabel": "Data de nascimento",
+      "ageNotice": "O Lumen é só para adultos (18+).",
+      "submit": "Criar conta",
+      "error": "Não foi possível criar a conta. Confirma os dados e tenta novamente.",
+      "haveAccount": "Já tens conta?",
+      "loginLink": "Iniciar sessão"
+    },
+    "logout": "Terminar sessão"
+  },
+  "consent": {
+    "title": "Antes de fazeres check-in",
+    "description": "O Lumen precisa do teu consentimento explícito para processar os dados de bem-estar que registas (humor, energia, sono). Podes revogá-lo a qualquer momento — os check-ins simplesmente pausam até voltares a conceder.",
+    "grant": "Eu consinto",
+    "loading": "A verificar o teu consentimento…"
   }
 }

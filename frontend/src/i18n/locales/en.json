@@ -34,5 +34,36 @@
   "language": {
     "en": "EN",
     "pt": "PT"
+  },
+  "auth": {
+    "login": {
+      "title": "Log in",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "submit": "Log in",
+      "error": "Invalid email or password.",
+      "noAccount": "Don't have an account?",
+      "registerLink": "Create one"
+    },
+    "register": {
+      "title": "Create your account",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "displayNameLabel": "Name",
+      "regionLabel": "Region",
+      "dateOfBirthLabel": "Date of birth",
+      "ageNotice": "Lumen is only available to adults (18+).",
+      "submit": "Create account",
+      "error": "Couldn't create your account. Please check your details and try again.",
+      "haveAccount": "Already have an account?",
+      "loginLink": "Log in"
+    },
+    "logout": "Log out"
+  },
+  "consent": {
+    "title": "Before you check in",
+    "description": "Lumen needs your explicit consent to process the wellbeing data you log (mood, energy, sleep). You can revoke it at any time — check-ins simply pause until you grant it again.",
+    "grant": "I consent",
+    "loading": "Checking your consent status…"
   }
 }
