@@ -1,10 +1,11 @@
 import { useTranslation } from 'react-i18next'
 import { useMoodHistory } from './useMoodCheckIns'
-import { DEMO_USER_ID } from '../../config/demoUser'
+import { useAuth } from '../../contexts/AuthContext'
 
 export function MoodHistory() {
   const { t } = useTranslation()
-  const { data, isLoading, isError } = useMoodHistory(DEMO_USER_ID)
+  const { user } = useAuth()
+  const { data, isLoading, isError } = useMoodHistory(user!.id)
 
   return (
     <section className="flex flex-col gap-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6">
