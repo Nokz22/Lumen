@@ -7,9 +7,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import dev.lumen.application.audit.AuditLogService;
+import dev.lumen.application.consent.ConsentService;
 import dev.lumen.domain.moodcheckin.MoodCheckIn;
 import dev.lumen.domain.moodcheckin.MoodCheckInRepository;
 import dev.lumen.domain.moodcheckin.MoodEmotion;
+import dev.lumen.domain.user.ConsentRequiredException;
+import dev.lumen.domain.user.ConsentType;
+import dev.lumen.domain.user.Role;
 import dev.lumen.domain.user.User;
 import dev.lumen.domain.user.UserNotFoundException;
 import dev.lumen.domain.user.UserRepository;
@@ -25,15 +30,19 @@ class MoodCheckInServiceTest {
 
     private final UserRepository userRepository = mock(UserRepository.class);
     private final MoodCheckInRepository moodCheckInRepository = mock(MoodCheckInRepository.class);
-    private final MoodCheckInService service =
-            new MoodCheckInService(moodCheckInRepository, userRepository, new MoodCheckInMapperImpl());
+    private final ConsentService consentService = mock(ConsentService.class);
+    private final AuditLogService auditLogService = mock(AuditLogService.class);
+    private final MoodCheckInService service = new MoodCheckInService(
+            moodCheckInRepository, userRepository, new MoodCheckInMapperImpl(), consentService, auditLogService);
 
     private User user;
 
     @BeforeEach
     void setUp() {
-        user = new User("jane@lumen.dev", "Jane", "en", "PT");
+        user = new User(
+                "jane@lumen.dev", "hashed-password", "Jane", "en", "PT", LocalDate.of(1990, 1, 1), Role.USER);
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(consentService.isActive(user.getId(), ConsentType.HEALTH_DATA_PROCESSING)).thenReturn(true);
     }
 
     @Test
@@ -72,5 +81,14 @@ class MoodCheckInServiceTest {
         assertThatThrownBy(
                         () -> service.checkIn(unknownUserId, MoodEmotion.HAPPY, 4, new BigDecimal("7.0"), 4, null))
                 .isInstanceOf(UserNotFoundException.class);
+    }
+
+    @Test
+    void shouldThrowWhenHealthDataConsentIsNotActive() {
+        when(consentService.isActive(user.getId(), ConsentType.HEALTH_DATA_PROCESSING))
+                .thenReturn(false);
+
+        assertThatThrownBy(() -> service.checkIn(user.getId(), MoodEmotion.HAPPY, 4, new BigDecimal("7.0"), 4, null))
+                .isInstanceOf(ConsentRequiredException.class);
     }
 }
