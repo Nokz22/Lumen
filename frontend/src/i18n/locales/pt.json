@@ -1,0 +1,38 @@
+{
+  "app": {
+    "title": "Lumen",
+    "tagline": "Um espaço para te observares e cuidares do corpo e da mente."
+  },
+  "checkin": {
+    "title": "Check-in diário",
+    "emotionLabel": "Como te sentes hoje?",
+    "emotion": {
+      "HAPPY": "Feliz",
+      "SAD": "Triste",
+      "ANGRY": "Zangado",
+      "ANXIOUS": "Ansioso",
+      "FRUSTRATED": "Frustrado",
+      "NEUTRAL": "Neutro"
+    },
+    "energyLabel": "Nível de energia",
+    "sleepHoursLabel": "Horas de sono",
+    "sleepQualityLabel": "Qualidade do sono",
+    "noteLabel": "Nota (opcional)",
+    "notePlaceholder": "Alguma coisa que queiras lembrar sobre hoje",
+    "submit": "Guardar check-in",
+    "success": "Check-in guardado",
+    "error": "Não foi possível guardar o check-in. Tenta novamente."
+  },
+  "dashboard": {
+    "title": "O teu histórico",
+    "empty": "Ainda não há check-ins — o primeiro vai aparecer aqui.",
+    "loading": "A carregar o teu histórico…",
+    "loggedFeeling": "Registaste sentir-te {{emotion}}",
+    "energy": "Energia {{level}}/5",
+    "sleep": "{{hours}}h de sono, qualidade {{quality}}/5"
+  },
+  "language": {
+    "en": "EN",
+    "pt": "PT"
+  }
+}
