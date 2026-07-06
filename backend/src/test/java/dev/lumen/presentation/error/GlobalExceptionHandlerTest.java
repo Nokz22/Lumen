@@ -20,4 +20,11 @@ class GlobalExceptionHandlerTest {
         assertThat(problem.getDetail()).isEqualTo("An unexpected error occurred");
         assertThat(problem.getDetail()).doesNotContain("secret");
     }
+
+    @Test
+    void shouldMapAccessDeniedToForbidden() {
+        ProblemDetail problem = handler.handleAccessDenied();
+
+        assertThat(problem.getStatus()).isEqualTo(HttpStatus.FORBIDDEN.value());
+    }
 }

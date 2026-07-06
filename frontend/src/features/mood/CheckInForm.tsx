@@ -2,17 +2,18 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSubmitMoodCheckIn } from './useMoodCheckIns'
 import { MOOD_EMOTIONS, type MoodEmotion } from '../../types/mood'
-import { DEMO_USER_ID } from '../../config/demoUser'
+import { useAuth } from '../../contexts/AuthContext'
 
 export function CheckInForm() {
   const { t } = useTranslation()
+  const { user } = useAuth()
   const [emotion, setEmotion] = useState<MoodEmotion>('NEUTRAL')
   const [energyLevel, setEnergyLevel] = useState(3)
   const [sleepHours, setSleepHours] = useState(7)
   const [sleepQuality, setSleepQuality] = useState(3)
   const [note, setNote] = useState('')
 
-  const submitCheckIn = useSubmitMoodCheckIn(DEMO_USER_ID)
+  const submitCheckIn = useSubmitMoodCheckIn(user!.id)
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
