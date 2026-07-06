@@ -2,11 +2,13 @@ package dev.lumen.domain.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
 class ConsentRecordTest {
 
-    private final User user = new User("jane@lumen.dev", "Jane", "en", "PT");
+    private final User user =
+            new User("jane@lumen.dev", "hashed-password", "Jane", "en", "PT", LocalDate.of(1990, 1, 1), Role.USER);
 
     @Test
     void shouldStampGrantedAtAndLeaveRevokedAtNullWhenGranted() {
