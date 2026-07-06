@@ -18,9 +18,26 @@ spring:
   config:
     activate:
       on-profile: dev
+  datasource:
+    url: jdbc:postgresql://localhost:${POSTGRES_PORT:5432}/${POSTGRES_DB:lumen}
+    username: ${POSTGRES_USER:lumen}
+    password: ${POSTGRES_PASSWORD:changeme}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    locations: classpath:db/migration,classpath:db/dev-seed
 
 ---
 spring:
   config:
     activate:
       on-profile: test
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true

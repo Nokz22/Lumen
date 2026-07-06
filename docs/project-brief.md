@@ -70,7 +70,7 @@ não reaprender ferramentas. O que muda é o domínio, não o esqueleto.
 **Frontend**
 - React 18 + TypeScript strict + Vite, **web responsiva primeiro** (mobile nativa é
   outra escala — fica como future work)
-- Tailwind CSS, TanStack Query, react-i18next (**PT-PT principal, EN secundário**)
+- Tailwind CSS, TanStack Query, react-i18next (**EN principal, PT-PT como opção alternável**)
 - STOMP.js, Vitest + React Testing Library
 
 **Infra**

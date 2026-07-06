@@ -45,7 +45,7 @@ substitui cuidado profissional. Apenas adultos (18+).
 ## Stack (fixa — não trocar sem me perguntar)
 Java 17, Spring Boot 3 (Gradle), PostgreSQL, Flyway, Spring Security + JWT, RabbitMQ,
 WebSocket/STOMP, MapStruct, Testcontainers, JUnit 5, Mockito.
-React 18 + TS strict + Vite, Tailwind, TanStack Query, react-i18next (PT-PT + EN).
+React 18 + TS strict + Vite, Tailwind, TanStack Query, react-i18next (EN principal, PT-PT opção).
 Docker, GitHub Actions. LLM (Fase 6) atrás da interface `LlmClient`.
 
 ## Arquitetura (não-negociável, verificada por ArchUnit no CI)
