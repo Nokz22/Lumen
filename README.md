@@ -25,7 +25,7 @@ nos nomes de campos da API e nos prompts do LLM.
 RabbitMQ, WebSocket/STOMP, MapStruct, JUnit 5 + Mockito + Testcontainers.
 
 **Frontend:** React 18 + TypeScript strict + Vite, Tailwind CSS, TanStack Query,
-react-i18next (PT-PT + EN).
+react-i18next (EN principal, PT-PT como opção).
 
 **Infra:** Docker Compose (dev), GitHub Actions (CI).
 
@@ -54,7 +54,14 @@ cd backend
 ./gradlew bootRun
 ```
 
-Health check: `curl http://localhost:8080/actuator/health`.
+Health check: `curl http://localhost:8080/actuator/health`. CORS já aceita
+`http://localhost:5173` (o frontend em dev) — configurável via `app.cors.allowed-origins`.
+
+> **Se o backend não conseguir ligar-se ao Postgres** ("role does not exist" ou
+> semelhante): confirma que não tens outro Postgres local a ocupar a porta 5432
+> (`lsof -i:5432`). Um Postgres instalado via Homebrew, por exemplo, ganha a ligações a
+> `localhost:5432` mesmo com o do Docker publicado na mesma porta — pára-o
+> (`brew services stop postgresql@15`) ou muda `POSTGRES_PORT` no teu `.env`.
 
 ### Frontend
 
@@ -64,6 +71,10 @@ npm install
 npm run dev
 ```
 
+Sem autenticação ainda (Fase 2): o check-in usa um **utilizador de demonstração** com
+UUID fixo `11111111-1111-1111-1111-111111111111`, semeado por
+`db/dev-seed/V3__seed_demo_user.sql` (só no perfil `dev`).
+
 ## Variáveis de ambiente
 
 Ver [`.env.example`](.env.example) — credenciais de PostgreSQL e RabbitMQ para
@@ -72,7 +83,7 @@ desenvolvimento local. Nunca versionar um `.env` real.
 ## Testes e qualidade
 
 ```bash
-cd backend && ./gradlew build   # testes JUnit + Checkstyle (zero-warnings)
+cd backend && ./gradlew build   # JUnit + Testcontainers + ArchUnit + Checkstyle + gate JaCoCo (80% linha)
 cd frontend && npm run lint     # ESLint
 cd frontend && npm run build    # type-check (tsc) + build
 ```
@@ -90,11 +101,13 @@ docs/       project-brief, standards, ADRs, diagramas
 - [`docs/project-brief.md`](docs/project-brief.md) — o quê e porquê, fases, domínio, fluxo de crise.
 - [`docs/standards.md`](docs/standards.md) — standards de engenharia, plano de commits e Definition of Done por fase.
 - [`docs/adr/`](docs/adr/) — Architecture Decision Records.
+- [`docs/glossary.md`](docs/glossary.md) — linguagem única partilhada entre código, API e UI.
+- [`docs/diagrams/domain-model-phase1.md`](docs/diagrams/domain-model-phase1.md) — modelo de domínio (Mermaid).
 
 ## Roadmap (fases)
 
 - [x] **Fase 0** — Fundações + fronteira ética
-- [ ] Fase 1 — Domínio + check-in diário + dashboard base
+- [x] **Fase 1** — Domínio + check-in diário + dashboard base
 - [ ] Fase 2 — Autenticação, roles e base de RGPD
 - [ ] Fase 3 — Instrumentos + fluxo de crise
 - [ ] Fase 4 — Motor de recomendação + biblioteca de exercícios
