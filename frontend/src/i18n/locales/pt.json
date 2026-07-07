@@ -150,5 +150,21 @@
       "empty": "Ainda não há sugestões — vão aparecer aqui depois de um check-in.",
       "error": "Não foi possível carregar as tuas sugestões. Tenta novamente."
     }
+  },
+  "wearable": {
+    "loading": "A verificar as tuas definições de dados do wearable…",
+    "title": "Sinais do corpo",
+    "generateDemoData": "Gerar dados de demonstração",
+    "disclaimer": "Não há nenhum dispositivo real ligado — isto usa dados sintéticos para demonstrar a funcionalidade.",
+    "consent": {
+      "title": "Insights de sinais do corpo",
+      "description": "O Lumen pode mostrar-te padrões entre sinais fisiológicos (sono, frequência cardíaca, passos) e como registas sentir-te. Ainda não há nenhum dispositivo real ligado — podes gerar dados sintéticos de demonstração para ver como funciona.",
+      "grant": "Eu consinto"
+    },
+    "insights": {
+      "loading": "A procurar padrões…",
+      "empty": "Ainda não foram encontrados padrões — tenta gerar dados de demonstração.",
+      "error": "Não foi possível carregar os insights. Tenta novamente."
+    }
   }
 }

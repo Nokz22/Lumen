@@ -150,5 +150,21 @@
       "empty": "No suggestions yet — they'll show up here after a check-in.",
       "error": "Couldn't load your suggestions. Please try again."
     }
+  },
+  "wearable": {
+    "loading": "Checking your wearable data settings…",
+    "title": "Body signals",
+    "generateDemoData": "Generate demo data",
+    "disclaimer": "No real device is connected — this uses synthetic data to demonstrate the feature.",
+    "consent": {
+      "title": "Body signal insights",
+      "description": "Lumen can show you patterns between physiological signals (sleep, heart rate, steps) and how you report feeling. No real device is connected yet — you can generate synthetic demo data to see how it works.",
+      "grant": "I consent"
+    },
+    "insights": {
+      "loading": "Looking for patterns…",
+      "empty": "No patterns found yet — try generating some demo data.",
+      "error": "Couldn't load insights. Please try again."
+    }
   }
 }
