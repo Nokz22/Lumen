@@ -40,6 +40,14 @@ push por WebSocket para o dashboard. O texto do "porquê" psicoeducativo de cada
 exercício (`db/migration/V12__create_exercises.sql`) é a minha melhor tentativa em
 linguagem de bem-estar, não revisto clinicamente — mesmo aviso da tradução PT-PT acima.
 
+## Ingestão de wearable (ver [ADR-0008](docs/adr/0008-provider-agnostic-wearable-ingestion.md))
+
+**Nenhum dispositivo real está ligado.** A porta `WearableSource` é provider-agnostic
+por desenho (um adaptador Fitbit/Garmin real implementaria a mesma interface sem
+tocar no domínio), mas o único adaptador existente hoje é o `SIMULATOR` — todos os
+sinais fisiológicos que aparecem na app são sintéticos, gerados para demonstrar o
+mecanismo de ingestão e correlação, nunca dados reais de ninguém.
+
 ## Stack
 
 **Backend:** Java 17, Spring Boot 3 (Gradle), PostgreSQL + Flyway, Spring Security + JWT,
@@ -135,6 +143,6 @@ docs/       project-brief, standards, ADRs, diagramas
 - [x] **Fase 2** — Autenticação, roles e base de RGPD
 - [x] **Fase 3** — Instrumentos + fluxo de crise
 - [x] **Fase 4** — Motor de recomendação + biblioteca de exercícios
-- [ ] Fase 5 — Ingestão de wearable (provider-agnostic)
+- [x] **Fase 5** — Ingestão de wearable (provider-agnostic)
 - [ ] Fase 6 — Companheiro LLM com guardrails + memória
 - [ ] Fase 7 — Polimento, deploy e documentação
