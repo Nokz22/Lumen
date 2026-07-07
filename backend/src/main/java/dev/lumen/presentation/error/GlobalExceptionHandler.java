@@ -2,6 +2,11 @@ package dev.lumen.presentation.error;
 
 import dev.lumen.application.auth.InvalidCredentialsException;
 import dev.lumen.application.auth.InvalidRefreshTokenException;
+import dev.lumen.domain.assessment.AssessmentNotFoundException;
+import dev.lumen.domain.assessment.AssessmentTooSoonException;
+import dev.lumen.domain.assessment.InvalidAssessmentSubmissionException;
+import dev.lumen.domain.crisis.InvalidRiskEventTransitionException;
+import dev.lumen.domain.crisis.RiskEventNotFoundException;
 import dev.lumen.domain.user.ConsentRequiredException;
 import dev.lumen.domain.user.EmailAlreadyRegisteredException;
 import dev.lumen.domain.user.UnderageRegistrationException;
@@ -26,6 +31,26 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UserNotFoundException.class)
     public ProblemDetail handleUserNotFound(UserNotFoundException exception) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage());
+    }
+
+    @ExceptionHandler({AssessmentNotFoundException.class, RiskEventNotFoundException.class})
+    public ProblemDetail handleAssessmentOrRiskEventNotFound(RuntimeException exception) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage());
+    }
+
+    @ExceptionHandler(AssessmentTooSoonException.class)
+    public ProblemDetail handleAssessmentTooSoon(AssessmentTooSoonException exception) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, exception.getMessage());
+    }
+
+    @ExceptionHandler(InvalidAssessmentSubmissionException.class)
+    public ProblemDetail handleInvalidAssessmentSubmission(InvalidAssessmentSubmissionException exception) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage());
+    }
+
+    @ExceptionHandler(InvalidRiskEventTransitionException.class)
+    public ProblemDetail handleInvalidRiskEventTransition(InvalidRiskEventTransitionException exception) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, exception.getMessage());
     }
 
     @ExceptionHandler(EmailAlreadyRegisteredException.class)
