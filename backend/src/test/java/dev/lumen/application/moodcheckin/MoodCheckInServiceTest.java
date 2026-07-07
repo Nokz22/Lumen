@@ -12,6 +12,7 @@ import dev.lumen.application.consent.ConsentService;
 import dev.lumen.domain.moodcheckin.MoodCheckIn;
 import dev.lumen.domain.moodcheckin.MoodCheckInRepository;
 import dev.lumen.domain.moodcheckin.MoodEmotion;
+import dev.lumen.domain.recommendation.MoodCheckInEventPublisher;
 import dev.lumen.domain.user.ConsentRequiredException;
 import dev.lumen.domain.user.ConsentType;
 import dev.lumen.domain.user.Role;
@@ -32,8 +33,14 @@ class MoodCheckInServiceTest {
     private final MoodCheckInRepository moodCheckInRepository = mock(MoodCheckInRepository.class);
     private final ConsentService consentService = mock(ConsentService.class);
     private final AuditLogService auditLogService = mock(AuditLogService.class);
+    private final MoodCheckInEventPublisher eventPublisher = mock(MoodCheckInEventPublisher.class);
     private final MoodCheckInService service = new MoodCheckInService(
-            moodCheckInRepository, userRepository, new MoodCheckInMapperImpl(), consentService, auditLogService);
+            moodCheckInRepository,
+            userRepository,
+            new MoodCheckInMapperImpl(),
+            consentService,
+            auditLogService,
+            eventPublisher);
 
     private User user;
 
