@@ -41,6 +41,11 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration,classpath:db/dev-seed
+  rabbitmq:
+    host: localhost
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_DEFAULT_USER:lumen}
+    password: ${RABBITMQ_DEFAULT_PASS:changeme}
 
 ---
 spring:
