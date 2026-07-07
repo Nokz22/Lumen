@@ -5,6 +5,7 @@ import { ConsentGate } from '../features/consent/ConsentGate'
 import { AssessmentPanel } from '../features/assessment/AssessmentPanel'
 import { RecommendationFeed } from '../features/recommendation/RecommendationFeed'
 import { ExerciseLibrary } from '../features/exercise/ExerciseLibrary'
+import { WearablePanel } from '../features/wearable/WearablePanel'
 
 export function DashboardPage() {
   return (
@@ -15,6 +16,7 @@ export function DashboardPage() {
         <RecommendationFeed />
         <ExerciseLibrary />
         <AssessmentPanel />
+        <WearablePanel />
       </ConsentGate>
     </AppLayout>
   )
