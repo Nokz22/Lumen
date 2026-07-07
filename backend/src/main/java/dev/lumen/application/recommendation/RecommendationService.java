@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,6 +49,14 @@ public class RecommendationService {
             return;
         }
         determineRecommendations(event).forEach((category, reason) -> recommend(event, category, reason));
+    }
+
+    @Transactional(readOnly = true)
+    public List<RecommendationSummaryResponse> getHistory(UUID userId) {
+        return recommendationRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
+                .map(r -> new RecommendationSummaryResponse(
+                        r.getId(), r.getExerciseId(), r.getReason(), r.getCreatedAt()))
+                .toList();
     }
 
     private void recommend(MoodCheckInSubmittedEvent event, ExerciseCategory category, String reason) {
