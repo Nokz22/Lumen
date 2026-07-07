@@ -7,6 +7,7 @@ import dev.lumen.domain.assessment.AssessmentTooSoonException;
 import dev.lumen.domain.assessment.InvalidAssessmentSubmissionException;
 import dev.lumen.domain.crisis.InvalidRiskEventTransitionException;
 import dev.lumen.domain.crisis.RiskEventNotFoundException;
+import dev.lumen.domain.exercise.ExerciseNotFoundException;
 import dev.lumen.domain.user.ConsentRequiredException;
 import dev.lumen.domain.user.EmailAlreadyRegisteredException;
 import dev.lumen.domain.user.UnderageRegistrationException;
@@ -33,8 +34,12 @@ public class GlobalExceptionHandler {
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage());
     }
 
-    @ExceptionHandler({AssessmentNotFoundException.class, RiskEventNotFoundException.class})
-    public ProblemDetail handleAssessmentOrRiskEventNotFound(RuntimeException exception) {
+    @ExceptionHandler({
+        AssessmentNotFoundException.class,
+        RiskEventNotFoundException.class,
+        ExerciseNotFoundException.class
+    })
+    public ProblemDetail handleNotFound(RuntimeException exception) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage());
     }
 
