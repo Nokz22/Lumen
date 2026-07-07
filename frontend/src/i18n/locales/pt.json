@@ -124,5 +124,31 @@
       "acknowledge": "Já vi estes recursos",
       "disclaimer": "Se estás em perigo imediato, contacta os serviços de emergência."
     }
+  },
+  "exercise": {
+    "markDone": "Marcar como feito",
+    "durationMinutes": "{{minutes}} min",
+    "category": {
+      "BREATHING": "Respiração",
+      "WALKING": "Caminhada",
+      "STRETCHING": "Alongamento",
+      "SLEEP_HYGIENE": "Higiene de sono",
+      "BEHAVIORAL_ACTIVATION": "Ativação comportamental",
+      "GROUNDING": "Grounding"
+    },
+    "library": {
+      "title": "Biblioteca de exercícios",
+      "loading": "A carregar a biblioteca de exercícios…",
+      "empty": "Ainda não há exercícios disponíveis.",
+      "error": "Não foi possível carregar a biblioteca. Tenta novamente."
+    }
+  },
+  "recommendation": {
+    "feed": {
+      "title": "Sugerido para ti",
+      "loading": "A carregar as tuas sugestões…",
+      "empty": "Ainda não há sugestões — vão aparecer aqui depois de um check-in.",
+      "error": "Não foi possível carregar as tuas sugestões. Tenta novamente."
+    }
   }
 }
