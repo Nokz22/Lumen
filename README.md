@@ -19,6 +19,19 @@ A linguagem em toda a app é não-diagnóstica: "pontuação de bem-estar", nunc
 depressão"; "registaste sentir-te", nunca "estás". Esta regra vive nos textos de UI,
 nos nomes de campos da API e nos prompts do LLM.
 
+## Fluxo de crise (ver [ADR-0006](docs/adr/0006-clinical-safety-model-crisis-flow.md))
+
+Uma resposta positiva ao item 9 do PHQ-9 interrompe o instrumento antes de qualquer
+pontuação existir e mostra os recursos de crise da região. Dois avisos importantes:
+
+- **Contactos de crise** (`db/migration/V11__create_crisis_resources.sql`): semeados
+  com os números reais mencionados no brief (SNS 24, SOS Voz Amiga, 112). **Confirma
+  que estão atuais antes de qualquer demonstração pública** — números e horários de
+  linhas de apoio mudam.
+- **Tradução PT-PT dos itens do PHQ-9/GAD-7** (`frontend/src/i18n/locales/pt.json`):
+  melhor esforço a partir de traduções de referência conhecidas, mas **não revista por
+  um profissional**. Não usar em contexto real sem essa revisão.
+
 ## Stack
 
 **Backend:** Java 17, Spring Boot 3 (Gradle), PostgreSQL + Flyway, Spring Security + JWT,
@@ -103,6 +116,7 @@ docs/       project-brief, standards, ADRs, diagramas
 - [`docs/adr/`](docs/adr/) — Architecture Decision Records.
 - [`docs/glossary.md`](docs/glossary.md) — linguagem única partilhada entre código, API e UI.
 - [`docs/diagrams/domain-model-phase1.md`](docs/diagrams/domain-model-phase1.md) — modelo de domínio (Mermaid).
+- [`docs/diagrams/crisis-flow-state-machine.md`](docs/diagrams/crisis-flow-state-machine.md) — máquina de estados do `Assessment`/`RiskEvent` (Mermaid).
 - [`docs/threat-model.md`](docs/threat-model.md) — ativo → ameaça → mitigação.
 
 ## Roadmap (fases)
@@ -110,7 +124,7 @@ docs/       project-brief, standards, ADRs, diagramas
 - [x] **Fase 0** — Fundações + fronteira ética
 - [x] **Fase 1** — Domínio + check-in diário + dashboard base
 - [x] **Fase 2** — Autenticação, roles e base de RGPD
-- [ ] Fase 3 — Instrumentos + fluxo de crise
+- [x] **Fase 3** — Instrumentos + fluxo de crise
 - [ ] Fase 4 — Motor de recomendação + biblioteca de exercícios
 - [ ] Fase 5 — Ingestão de wearable (provider-agnostic)
 - [ ] Fase 6 — Companheiro LLM com guardrails + memória

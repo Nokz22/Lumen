@@ -65,5 +65,64 @@
     "description": "O Lumen precisa do teu consentimento explícito para processar os dados de bem-estar que registas (humor, energia, sono). Podes revogá-lo a qualquer momento — os check-ins simplesmente pausam até voltares a conceder.",
     "grant": "Eu consinto",
     "loading": "A verificar o teu consentimento…"
+  },
+  "assessment": {
+    "title": "Verificação de bem-estar",
+    "instructions": "Nas últimas 2 semanas, com que frequência foste incomodado/a pelo seguinte?",
+    "instrument": {
+      "PHQ9": "PHQ-9",
+      "GAD7": "GAD-7"
+    },
+    "scale": {
+      "0": "Nunca",
+      "1": "Vários dias",
+      "2": "Mais de metade dos dias",
+      "3": "Quase todos os dias"
+    },
+    "phq9": {
+      "items": {
+        "1": "Pouco interesse ou prazer em fazer as coisas",
+        "2": "Sentir-se em baixo, deprimido/a ou sem esperança",
+        "3": "Dificuldade em adormecer ou em manter o sono, ou dormir demasiado",
+        "4": "Sentir-se cansado/a ou com pouca energia",
+        "5": "Falta de apetite ou comer demasiado",
+        "6": "Sentir-se mal consigo mesmo/a — ou sentir que é um/a fracassado/a, ou que desiludiu a sua família ou a si próprio/a",
+        "7": "Dificuldade em concentrar-se em coisas como ler o jornal ou ver televisão",
+        "8": "Lentidão a mexer-se ou a falar, a ponto de outras pessoas poderem ter notado — ou o oposto, estar tão agitado/a ou inquieto/a que tem estado a mexer-se muito mais do que o costume",
+        "9": "Pensamentos de que seria melhor estar morto/a ou de se magoar de alguma forma"
+      }
+    },
+    "gad7": {
+      "items": {
+        "1": "Sentir-se nervoso/a, ansioso/a ou muito tenso/a",
+        "2": "Não ser capaz de parar ou controlar a preocupação",
+        "3": "Preocupar-se demasiado com diversas coisas",
+        "4": "Dificuldade em relaxar",
+        "5": "Ficar tão inquieto/a que se torna difícil estar parado/a",
+        "6": "Ficar facilmente aborrecido/a ou irritável",
+        "7": "Sentir medo, como se algo terrível pudesse acontecer"
+      }
+    },
+    "submit": "Submeter",
+    "tooSoon": "Já completaste esta verificação recentemente. Podes repeti-la dentro de 30 dias.",
+    "error": "Algo correu mal ao submeter as tuas respostas. Tenta novamente.",
+    "result": {
+      "title": "O teu resultado",
+      "band": {
+        "MINIMAL": "A tua pontuação de bem-estar está numa faixa mínima.",
+        "MILD": "A tua pontuação de bem-estar está numa faixa ligeira — vale a pena continuar a observar.",
+        "MODERATE": "A tua pontuação de bem-estar está numa faixa moderada — vale a pena dar atenção extra.",
+        "PRONOUNCED": "A tua pontuação de bem-estar está numa faixa acentuada — pode ser um bom momento para conversar com alguém.",
+        "ELEVATED": "A tua pontuação de bem-estar está numa faixa elevada — considera procurar apoio profissional."
+      },
+      "done": "Concluído"
+    },
+    "crisis": {
+      "title": "Vamos parar aqui um momento",
+      "message": "Uma das tuas respostas sugere que podes estar a passar por algo difícil neste momento. O Lumen é um companheiro de bem-estar, não um serviço de emergência — os recursos abaixo podem oferecer apoio real.",
+      "resourcesTitle": "Recursos de apoio",
+      "acknowledge": "Já vi estes recursos",
+      "disclaimer": "Se estás em perigo imediato, contacta os serviços de emergência."
+    }
   }
 }
