@@ -124,5 +124,31 @@
       "acknowledge": "I've seen these resources",
       "disclaimer": "If you are in immediate danger, please contact emergency services."
     }
+  },
+  "exercise": {
+    "markDone": "Mark as done",
+    "durationMinutes": "{{minutes}} min",
+    "category": {
+      "BREATHING": "Breathing",
+      "WALKING": "Walking",
+      "STRETCHING": "Stretching",
+      "SLEEP_HYGIENE": "Sleep hygiene",
+      "BEHAVIORAL_ACTIVATION": "Behavioral activation",
+      "GROUNDING": "Grounding"
+    },
+    "library": {
+      "title": "Exercise library",
+      "loading": "Loading the exercise library…",
+      "empty": "No exercises available yet.",
+      "error": "Couldn't load the exercise library. Please try again."
+    }
+  },
+  "recommendation": {
+    "feed": {
+      "title": "Suggested for you",
+      "loading": "Loading your suggestions…",
+      "empty": "No suggestions yet — they'll show up here after a check-in.",
+      "error": "Couldn't load your suggestions. Please try again."
+    }
   }
 }
