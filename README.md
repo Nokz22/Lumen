@@ -32,6 +32,14 @@ pontuação existir e mostra os recursos de crise da região. Dois avisos import
   melhor esforço a partir de traduções de referência conhecidas, mas **não revista por
   um profissional**. Não usar em contexto real sem essa revisão.
 
+## Motor de recomendação (ver [ADR-0007](docs/adr/0007-rule-based-recommendation-engine.md))
+
+Regras determinísticas e explicáveis (nunca ML) mapeiam o check-in diário para
+sugestões de auto-cuidado — check-in → evento RabbitMQ → `RecommendationService` →
+push por WebSocket para o dashboard. O texto do "porquê" psicoeducativo de cada
+exercício (`db/migration/V12__create_exercises.sql`) é a minha melhor tentativa em
+linguagem de bem-estar, não revisto clinicamente — mesmo aviso da tradução PT-PT acima.
+
 ## Stack
 
 **Backend:** Java 17, Spring Boot 3 (Gradle), PostgreSQL + Flyway, Spring Security + JWT,
@@ -117,6 +125,7 @@ docs/       project-brief, standards, ADRs, diagramas
 - [`docs/glossary.md`](docs/glossary.md) — linguagem única partilhada entre código, API e UI.
 - [`docs/diagrams/domain-model-phase1.md`](docs/diagrams/domain-model-phase1.md) — modelo de domínio (Mermaid).
 - [`docs/diagrams/crisis-flow-state-machine.md`](docs/diagrams/crisis-flow-state-machine.md) — máquina de estados do `Assessment`/`RiskEvent` (Mermaid).
+- [`docs/diagrams/domain-model-phase4.md`](docs/diagrams/domain-model-phase4.md) — modelo de domínio `Exercise`/`Recommendation` (Mermaid).
 - [`docs/threat-model.md`](docs/threat-model.md) — ativo → ameaça → mitigação.
 
 ## Roadmap (fases)
@@ -125,7 +134,7 @@ docs/       project-brief, standards, ADRs, diagramas
 - [x] **Fase 1** — Domínio + check-in diário + dashboard base
 - [x] **Fase 2** — Autenticação, roles e base de RGPD
 - [x] **Fase 3** — Instrumentos + fluxo de crise
-- [ ] Fase 4 — Motor de recomendação + biblioteca de exercícios
+- [x] **Fase 4** — Motor de recomendação + biblioteca de exercícios
 - [ ] Fase 5 — Ingestão de wearable (provider-agnostic)
 - [ ] Fase 6 — Companheiro LLM com guardrails + memória
 - [ ] Fase 7 — Polimento, deploy e documentação
