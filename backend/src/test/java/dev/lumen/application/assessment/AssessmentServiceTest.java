@@ -8,8 +8,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import dev.lumen.application.audit.AuditLogService;
 import dev.lumen.application.consent.ConsentService;
+import dev.lumen.application.crisis.CrisisTriggerOutcome;
+import dev.lumen.application.crisis.RiskEventTriggerService;
 import dev.lumen.domain.assessment.Assessment;
 import dev.lumen.domain.assessment.AssessmentAnswer;
 import dev.lumen.domain.assessment.AssessmentAnswerRepository;
@@ -19,9 +20,6 @@ import dev.lumen.domain.assessment.AssessmentTooSoonException;
 import dev.lumen.domain.assessment.AssessmentType;
 import dev.lumen.domain.assessment.InvalidAssessmentSubmissionException;
 import dev.lumen.domain.assessment.WellbeingBand;
-import dev.lumen.domain.crisis.CrisisResourceRepository;
-import dev.lumen.domain.crisis.RiskEvent;
-import dev.lumen.domain.crisis.RiskEventRepository;
 import dev.lumen.domain.user.ConsentRequiredException;
 import dev.lumen.domain.user.ConsentType;
 import dev.lumen.domain.user.Role;
@@ -30,6 +28,7 @@ import dev.lumen.domain.user.UserRepository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -38,21 +37,17 @@ class AssessmentServiceTest {
     private final AssessmentRepository assessmentRepository = mock(AssessmentRepository.class);
     private final AssessmentAnswerRepository assessmentAnswerRepository = mock(AssessmentAnswerRepository.class);
     private final AssessmentScoreRepository assessmentScoreRepository = mock(AssessmentScoreRepository.class);
-    private final RiskEventRepository riskEventRepository = mock(RiskEventRepository.class);
-    private final CrisisResourceRepository crisisResourceRepository = mock(CrisisResourceRepository.class);
+    private final RiskEventTriggerService riskEventTriggerService = mock(RiskEventTriggerService.class);
     private final UserRepository userRepository = mock(UserRepository.class);
     private final ConsentService consentService = mock(ConsentService.class);
-    private final AuditLogService auditLogService = mock(AuditLogService.class);
 
     private final AssessmentService service = new AssessmentService(
             assessmentRepository,
             assessmentAnswerRepository,
             assessmentScoreRepository,
-            riskEventRepository,
-            crisisResourceRepository,
+            riskEventTriggerService,
             userRepository,
-            consentService,
-            auditLogService);
+            consentService);
 
     private User user;
 
@@ -67,8 +62,8 @@ class AssessmentServiceTest {
         when(assessmentRepository.save(any(Assessment.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(assessmentAnswerRepository.saveAll(any())).thenAnswer(invocation -> invocation.getArgument(0));
         when(assessmentScoreRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
-        when(riskEventRepository.save(any(RiskEvent.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(crisisResourceRepository.findByRegion(any())).thenReturn(List.of());
+        when(riskEventTriggerService.trigger(any(), any(), any(), any()))
+                .thenReturn(new CrisisTriggerOutcome(UUID.randomUUID(), List.of()));
     }
 
     @Test
@@ -81,7 +76,7 @@ class AssessmentServiceTest {
         ScoredAssessmentResult scored = (ScoredAssessmentResult) result;
         assertThat(scored.totalScore()).isZero();
         assertThat(scored.wellbeingBand()).isEqualTo(WellbeingBand.MINIMAL);
-        verify(riskEventRepository, never()).save(any());
+        verify(riskEventTriggerService, never()).trigger(any(), any(), any(), any());
     }
 
     @Test
@@ -92,7 +87,7 @@ class AssessmentServiceTest {
 
         assertThat(result).isInstanceOf(CrisisTriggeredResult.class);
         verify(assessmentScoreRepository, never()).save(any());
-        verify(riskEventRepository).save(any(RiskEvent.class));
+        verify(riskEventTriggerService).trigger(any(), any(), any(), any());
     }
 
     @Test
@@ -105,7 +100,7 @@ class AssessmentServiceTest {
         ScoredAssessmentResult scored = (ScoredAssessmentResult) result;
         assertThat(scored.totalScore()).isEqualTo(21);
         assertThat(scored.wellbeingBand()).isEqualTo(WellbeingBand.ELEVATED);
-        verify(riskEventRepository, never()).save(any());
+        verify(riskEventTriggerService, never()).trigger(any(), any(), any(), any());
     }
 
     @Test
