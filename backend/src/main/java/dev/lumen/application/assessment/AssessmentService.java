@@ -1,7 +1,8 @@
 package dev.lumen.application.assessment;
 
-import dev.lumen.application.audit.AuditLogService;
 import dev.lumen.application.consent.ConsentService;
+import dev.lumen.application.crisis.CrisisTriggerOutcome;
+import dev.lumen.application.crisis.RiskEventTriggerService;
 import dev.lumen.domain.assessment.Assessment;
 import dev.lumen.domain.assessment.AssessmentNotFoundException;
 import dev.lumen.domain.assessment.AssessmentRepository;
@@ -13,10 +14,6 @@ import dev.lumen.domain.assessment.AssessmentTooSoonException;
 import dev.lumen.domain.assessment.AssessmentType;
 import dev.lumen.domain.assessment.InvalidAssessmentSubmissionException;
 import dev.lumen.domain.assessment.WellbeingBand;
-import dev.lumen.domain.audit.AuditAction;
-import dev.lumen.domain.crisis.CrisisResourceRepository;
-import dev.lumen.domain.crisis.RiskEvent;
-import dev.lumen.domain.crisis.RiskEventRepository;
 import dev.lumen.domain.crisis.TriggerSource;
 import dev.lumen.domain.user.ConsentRequiredException;
 import dev.lumen.domain.user.ConsentType;
@@ -45,29 +42,23 @@ public class AssessmentService {
     private final AssessmentRepository assessmentRepository;
     private final AssessmentAnswerRepository assessmentAnswerRepository;
     private final AssessmentScoreRepository assessmentScoreRepository;
-    private final RiskEventRepository riskEventRepository;
-    private final CrisisResourceRepository crisisResourceRepository;
+    private final RiskEventTriggerService riskEventTriggerService;
     private final UserRepository userRepository;
     private final ConsentService consentService;
-    private final AuditLogService auditLogService;
 
     public AssessmentService(
             AssessmentRepository assessmentRepository,
             AssessmentAnswerRepository assessmentAnswerRepository,
             AssessmentScoreRepository assessmentScoreRepository,
-            RiskEventRepository riskEventRepository,
-            CrisisResourceRepository crisisResourceRepository,
+            RiskEventTriggerService riskEventTriggerService,
             UserRepository userRepository,
-            ConsentService consentService,
-            AuditLogService auditLogService) {
+            ConsentService consentService) {
         this.assessmentRepository = assessmentRepository;
         this.assessmentAnswerRepository = assessmentAnswerRepository;
         this.assessmentScoreRepository = assessmentScoreRepository;
-        this.riskEventRepository = riskEventRepository;
-        this.crisisResourceRepository = crisisResourceRepository;
+        this.riskEventTriggerService = riskEventTriggerService;
         this.userRepository = userRepository;
         this.consentService = consentService;
-        this.auditLogService = auditLogService;
     }
 
     @Transactional
@@ -126,16 +117,9 @@ public class AssessmentService {
     }
 
     private CrisisTriggeredResult triggerCrisisFlow(User user, Assessment assessment) {
-        RiskEvent riskEvent = new RiskEvent(user.getId(), assessment.getId(), TriggerSource.PHQ9_ITEM9);
-        riskEvent.presentResources();
-        riskEvent = riskEventRepository.save(riskEvent);
-        auditLogService.record(user.getId(), user.getId(), AuditAction.CRISIS_FLOW_TRIGGERED);
-
-        List<CrisisResourceResponse> resources = crisisResourceRepository.findByRegion(user.getRegion()).stream()
-                .map(resource -> new CrisisResourceResponse(
-                        resource.getName(), resource.getType(), resource.getContact(), resource.getAvailability()))
-                .toList();
-        return new CrisisTriggeredResult(riskEvent.getId(), resources);
+        CrisisTriggerOutcome outcome = riskEventTriggerService.trigger(
+                user.getId(), assessment.getId(), TriggerSource.PHQ9_ITEM9, user.getRegion());
+        return new CrisisTriggeredResult(outcome.riskEventId(), outcome.resources());
     }
 
     private AssessmentScore computeAndPersistScore(Assessment assessment, List<AssessmentAnswer> responses) {
