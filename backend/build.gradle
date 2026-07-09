@@ -21,7 +21,7 @@ repositories {
 
 ext {
 	mapstructVersion = '1.6.3'
-	archunitVersion = '1.3.0'
+	archunitVersion = '1.4.2'
 	jjwtVersion = '0.12.6'
 }
 
