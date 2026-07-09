@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
+import { CrisisScreen } from '../crisis/CrisisScreen'
 import { AssessmentForm } from './AssessmentForm'
-import { CrisisScreen } from './CrisisScreen'
 import { ResultScreen } from './ResultScreen'
-import { useSubmitAssessment } from './useAssessments'
+import { useAcknowledgeRiskEvent, useSubmitAssessment } from './useAssessments'
 import {
   isCrisisResult,
   type AssessmentType,
@@ -21,6 +21,7 @@ export function AssessmentPanel() {
   const [instrument, setInstrument] = useState<AssessmentType>('PHQ9')
   const [view, setView] = useState<ViewState>({ kind: 'form' })
   const submitAssessment = useSubmitAssessment(user!.id)
+  const acknowledge = useAcknowledgeRiskEvent(user!.id)
 
   function handleSubmit(responses: number[]) {
     submitAssessment.mutate(
@@ -42,17 +43,22 @@ export function AssessmentPanel() {
   }
 
   if (view.kind === 'crisis') {
+    const riskEventId = view.riskEventId
     return (
       <CrisisScreen
-        riskEventId={view.riskEventId}
         resources={view.resources}
-        onAcknowledged={(result) => {
-          if (result.wellbeingBand !== null) {
-            setView({ kind: 'result', wellbeingBand: result.wellbeingBand })
-          } else {
-            setView({ kind: 'form' })
-          }
-        }}
+        isAcknowledging={acknowledge.isPending}
+        onAcknowledge={() =>
+          acknowledge.mutate(riskEventId, {
+            onSuccess: (result) => {
+              if (result.wellbeingBand !== null) {
+                setView({ kind: 'result', wellbeingBand: result.wellbeingBand })
+              } else {
+                setView({ kind: 'form' })
+              }
+            },
+          })
+        }
       />
     )
   }
