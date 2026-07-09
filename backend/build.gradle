@@ -22,7 +22,7 @@ repositories {
 ext {
 	mapstructVersion = '1.6.3'
 	archunitVersion = '1.3.0'
-	jjwtVersion = '0.12.6'
+	jjwtVersion = '0.13.0'
 }
 
 dependencies {
