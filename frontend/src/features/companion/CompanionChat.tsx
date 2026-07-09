@@ -12,7 +12,8 @@ import {
   useSendMessage,
 } from './useCompanion'
 import { useCompanionSocket } from './useCompanionSocket'
-import { isConversationCrisisResult, type CrisisResource } from '../../types/companion'
+import { isConversationCrisisResult } from '../../types/companion'
+import type { CrisisResource } from '../../types/assessment'
 
 type ViewState =
   { kind: 'chat' } | { kind: 'crisis'; riskEventId: string; resources: CrisisResource[] }
