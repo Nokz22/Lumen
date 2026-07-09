@@ -35,6 +35,10 @@
     "en": "EN",
     "pt": "PT"
   },
+  "nav": {
+    "dashboard": "Dashboard",
+    "companion": "Companion"
+  },
   "auth": {
     "login": {
       "title": "Log in",
@@ -116,14 +120,14 @@
         "ELEVATED": "Your wellbeing score is in an elevated range — consider seeking professional support."
       },
       "done": "Done"
-    },
-    "crisis": {
-      "title": "Let's pause here for a moment",
-      "message": "One of your answers suggests you might be going through something difficult right now. Lumen is a wellbeing companion, not an emergency service — the resources below can offer real support.",
-      "resourcesTitle": "Support resources",
-      "acknowledge": "I've seen these resources",
-      "disclaimer": "If you are in immediate danger, please contact emergency services."
     }
+  },
+  "crisis": {
+    "title": "Let's pause here for a moment",
+    "message": "One of your answers suggests you might be going through something difficult right now. Lumen is a wellbeing companion, not an emergency service — the resources below can offer real support.",
+    "resourcesTitle": "Support resources",
+    "acknowledge": "I've seen these resources",
+    "disclaimer": "If you are in immediate danger, please contact emergency services."
   },
   "exercise": {
     "markDone": "Mark as done",
@@ -166,5 +170,25 @@
       "empty": "No patterns found yet — try generating some demo data.",
       "error": "Couldn't load insights. Please try again."
     }
+  },
+  "companion": {
+    "title": "Companion",
+    "loading": "Checking your companion chat settings…",
+    "disclaimer": "Lumen's companion offers wellbeing support, not medical advice or diagnosis. In a crisis, use the resources Lumen shows you or contact emergency services.",
+    "consent": {
+      "title": "Before you chat",
+      "description": "Lumen needs your explicit consent to send your messages to an AI companion for processing. You can revoke it at any time — chat simply pauses until you grant it again.",
+      "grant": "I consent"
+    },
+    "history": {
+      "loading": "Loading your conversation…",
+      "empty": "No messages yet — say hello to get started.",
+      "error": "Couldn't load your conversation. Please try again."
+    },
+    "typing": "Typing…",
+    "inputLabel": "Message",
+    "inputPlaceholder": "Write a message…",
+    "send": "Send",
+    "sendError": "Couldn't send your message. Please try again."
   }
 }
