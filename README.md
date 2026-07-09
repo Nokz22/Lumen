@@ -48,10 +48,27 @@ tocar no domínio), mas o único adaptador existente hoje é o `SIMULATOR` — t
 sinais fisiológicos que aparecem na app são sintéticos, gerados para demonstrar o
 mecanismo de ingestão e correlação, nunca dados reais de ninguém.
 
+## Companheiro LLM (ver [ADR-0009](docs/adr/0009-conversation-memory-window-plus-summary.md) e [ADR-0010](docs/adr/0010-llm-guardrails-three-layer-defense.md))
+
+O chat em `/companion` usa a Anthropic API real quando `ANTHROPIC_API_KEY` está
+definida (`app.llm.provider=anthropic`); sem ela, cai automaticamente para
+`CannedLlmClient`, um mock que nunca chama a rede e nunca custa nada — o perfil
+`test` força sempre o mock, independentemente do ambiente, por isso os testes
+automatizados (incluindo CI) nunca atingem a API real. A segurança nunca é confiada
+ao modelo: um classificador de risco de entrada (lista de frases PT+EN) dispara o
+fluxo de crise **antes** de o LLM ser sequer chamado, e continua a funcionar mesmo
+com o provider de LLM completamente indisponível (ver ADR-0010).
+
+Nota de contexto: a Sword desenvolveu o [MindEval](https://www.sword.health/), um
+framework para avaliar sistematicamente modelos de linguagem em diálogo de saúde
+mental. Os testes desta fase provam comportamento pontual contra frases conhecidas,
+não uma avaliação adversarial sistemática — MindEval é o padrão de rigor que uma
+versão de produção desta funcionalidade teria de perseguir.
+
 ## Stack
 
 **Backend:** Java 17, Spring Boot 3 (Gradle), PostgreSQL + Flyway, Spring Security + JWT,
-RabbitMQ, WebSocket/STOMP, MapStruct, JUnit 5 + Mockito + Testcontainers.
+RabbitMQ, WebSocket/STOMP, MapStruct, Resilience4j, JUnit 5 + Mockito + Testcontainers.
 
 **Frontend:** React 18 + TypeScript strict + Vite, Tailwind CSS, TanStack Query,
 react-i18next (EN principal, PT-PT como opção).
@@ -109,6 +126,11 @@ concedido, por isso já consegue fazer check-in imediatamente após login.
 Ver [`.env.example`](.env.example) — credenciais de PostgreSQL e RabbitMQ para
 desenvolvimento local. Nunca versionar um `.env` real.
 
+Para o companheiro LLM usar a Anthropic API real em vez do mock, define
+`LLM_PROVIDER=anthropic` e `ANTHROPIC_API_KEY=<a-tua-chave>` (opcionalmente
+`ANTHROPIC_MODEL`, por omissão `claude-sonnet-5`) antes de arrancar o backend. Sem
+isto, o chat funciona na mesma — só usa respostas fixas do `CannedLlmClient`.
+
 ## Testes e qualidade
 
 ```bash
@@ -144,5 +166,5 @@ docs/       project-brief, standards, ADRs, diagramas
 - [x] **Fase 3** — Instrumentos + fluxo de crise
 - [x] **Fase 4** — Motor de recomendação + biblioteca de exercícios
 - [x] **Fase 5** — Ingestão de wearable (provider-agnostic)
-- [ ] Fase 6 — Companheiro LLM com guardrails + memória
+- [x] **Fase 6** — Companheiro LLM com guardrails + memória
 - [ ] Fase 7 — Polimento, deploy e documentação
