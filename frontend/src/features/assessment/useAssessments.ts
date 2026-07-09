@@ -1,9 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import {
-  acknowledgeRiskEvent,
-  fetchAssessmentHistory,
-  submitAssessment,
-} from '../../api/assessments'
+import { fetchAssessmentHistory, submitAssessment } from '../../api/assessments'
+import { acknowledgeRiskEvent } from '../../api/riskEvents'
 import type { AssessmentType } from '../../types/assessment'
 
 const assessmentHistoryKey = (userId: string) => ['assessments', userId]
