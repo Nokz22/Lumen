@@ -100,9 +100,21 @@ public class CompanionResponseService {
         companionStreamNotifier.sendError(userId, LLM_UNAVAILABLE_FALLBACK);
     }
 
+    /**
+     * Best-effort: the reply this turn has already been persisted and streamed by the
+     * time this runs. If summarization fails, skip it rather than let the exception
+     * propagate — a stale summary just means a few more raw messages get included in
+     * next turn's context, corrected automatically on the next successful attempt.
+     */
     private void maybeSummarize(UUID userId) {
         conversationContextBuilder.planSummarizationIfNeeded(userId).ifPresent(plan -> {
-            String summaryText = llmClient.complete(plan.prompt());
+            String summaryText;
+            try {
+                summaryText = llmClient.complete(plan.prompt());
+            } catch (RuntimeException e) {
+                LOG.warn("Skipping conversation summarization after a failed LLM call", e);
+                return;
+            }
             ConversationSummary summary = conversationSummaryRepository
                     .findByUserId(userId)
                     .map(existing -> {
