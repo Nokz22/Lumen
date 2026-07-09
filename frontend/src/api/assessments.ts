@@ -1,6 +1,5 @@
 import { apiFetch } from './client'
 import type {
-  AcknowledgeResponse,
   AssessmentSubmissionResult,
   AssessmentSummary,
   AssessmentType,
@@ -22,16 +21,4 @@ export function submitAssessment(
 
 export function fetchAssessmentHistory(userId: string): Promise<AssessmentSummary[]> {
   return apiFetch<AssessmentSummary[]>(`/api/v1/users/${userId}/assessments`)
-}
-
-export function acknowledgeRiskEvent(
-  userId: string,
-  riskEventId: string,
-): Promise<AcknowledgeResponse> {
-  return apiFetch<AcknowledgeResponse>(
-    `/api/v1/users/${userId}/risk-events/${riskEventId}/acknowledge`,
-    {
-      method: 'POST',
-    },
-  )
 }
