@@ -5,6 +5,7 @@ import { ProtectedRoute } from './components/ProtectedRoute'
 import { LoginPage } from './pages/LoginPage'
 import { RegisterPage } from './pages/RegisterPage'
 import { DashboardPage } from './pages/DashboardPage'
+import { CompanionPage } from './pages/CompanionPage'
 
 const queryClient = new QueryClient()
 
@@ -21,6 +22,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <DashboardPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/companion"
+              element={
+                <ProtectedRoute>
+                  <CompanionPage />
                 </ProtectedRoute>
               }
             />

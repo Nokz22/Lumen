@@ -35,6 +35,10 @@
     "en": "EN",
     "pt": "PT"
   },
+  "nav": {
+    "dashboard": "Painel",
+    "companion": "Companheiro"
+  },
   "auth": {
     "login": {
       "title": "Iniciar sessão",
@@ -116,14 +120,14 @@
         "ELEVATED": "A tua pontuação de bem-estar está numa faixa elevada — considera procurar apoio profissional."
       },
       "done": "Concluído"
-    },
-    "crisis": {
-      "title": "Vamos parar aqui um momento",
-      "message": "Uma das tuas respostas sugere que podes estar a passar por algo difícil neste momento. O Lumen é um companheiro de bem-estar, não um serviço de emergência — os recursos abaixo podem oferecer apoio real.",
-      "resourcesTitle": "Recursos de apoio",
-      "acknowledge": "Já vi estes recursos",
-      "disclaimer": "Se estás em perigo imediato, contacta os serviços de emergência."
     }
+  },
+  "crisis": {
+    "title": "Vamos parar aqui um momento",
+    "message": "Uma das tuas respostas sugere que podes estar a passar por algo difícil neste momento. O Lumen é um companheiro de bem-estar, não um serviço de emergência — os recursos abaixo podem oferecer apoio real.",
+    "resourcesTitle": "Recursos de apoio",
+    "acknowledge": "Já vi estes recursos",
+    "disclaimer": "Se estás em perigo imediato, contacta os serviços de emergência."
   },
   "exercise": {
     "markDone": "Marcar como feito",
@@ -166,5 +170,25 @@
       "empty": "Ainda não foram encontrados padrões — tenta gerar dados de demonstração.",
       "error": "Não foi possível carregar os insights. Tenta novamente."
     }
+  },
+  "companion": {
+    "title": "Companheiro",
+    "loading": "A verificar as tuas definições do chat…",
+    "disclaimer": "O companheiro do Lumen oferece apoio de bem-estar, não aconselhamento médico nem diagnóstico. Em crise, usa os recursos que o Lumen te mostra ou contacta os serviços de emergência.",
+    "consent": {
+      "title": "Antes de conversares",
+      "description": "O Lumen precisa do teu consentimento explícito para enviar as tuas mensagens a um companheiro de IA para processamento. Podes revogá-lo a qualquer momento — o chat simplesmente pausa até voltares a conceder.",
+      "grant": "Eu consinto"
+    },
+    "history": {
+      "loading": "A carregar a tua conversa…",
+      "empty": "Ainda não há mensagens — diz olá para começar.",
+      "error": "Não foi possível carregar a tua conversa. Tenta novamente."
+    },
+    "typing": "A escrever…",
+    "inputLabel": "Mensagem",
+    "inputPlaceholder": "Escreve uma mensagem…",
+    "send": "Enviar",
+    "sendError": "Não foi possível enviar a tua mensagem. Tenta novamente."
   }
 }

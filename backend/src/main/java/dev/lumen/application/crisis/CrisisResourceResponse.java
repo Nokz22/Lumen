@@ -1,4 +1,4 @@
-package dev.lumen.application.assessment;
+package dev.lumen.application.crisis;
 
 import dev.lumen.domain.crisis.CrisisResourceType;
 
