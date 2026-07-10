@@ -14,6 +14,7 @@ export interface Exercise {
   holdAfterInhaleSeconds: number | null
   exhaleSeconds: number | null
   holdAfterExhaleSeconds: number | null
+  steps: string[]
 }
 
 export interface ExerciseCompletion {

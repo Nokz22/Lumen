@@ -152,6 +152,7 @@
       "exit": "Sair",
       "completed": "Muito bem.",
       "progress": "{{phase}} · ciclo {{cycle}} de {{totalCycles}}",
+      "step": "Passo {{step}} de {{totalSteps}}",
       "phase": {
         "INHALE": "Inspira",
         "HOLD_AFTER_INHALE": "Segura",

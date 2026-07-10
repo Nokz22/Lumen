@@ -46,4 +46,15 @@ class ExerciseServiceTest {
         assertThat(response.exhaleSeconds()).isNull();
         assertThat(response.holdAfterExhaleSeconds()).isNull();
     }
+
+    @Test
+    void shouldMapAnEmptyStepsListWhenExerciseHasNone() {
+        Exercise walk = new Exercise(
+                ExerciseCategory.WALKING, "10-Minute Outdoor Walk", 10, ExerciseIntensity.LOW, "rationale");
+        when(exerciseRepository.findAll()).thenReturn(List.of(walk));
+
+        List<ExerciseResponse> responses = service.listAll();
+
+        assertThat(responses.get(0).steps()).isEmpty();
+    }
 }

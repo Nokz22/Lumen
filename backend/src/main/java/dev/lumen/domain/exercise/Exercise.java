@@ -1,12 +1,17 @@
 package dev.lumen.domain.exercise;
 
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -54,6 +59,17 @@ public class Exercise {
 
     @Column(name = "hold_after_exhale_seconds")
     private Integer holdAfterExhaleSeconds;
+
+    /**
+     * Ordered guided-session instructions, one exercise-specific step per row. Populated
+     * for every category except BREATHING, which is guided by the phase timings above
+     * instead. Empty for exercises without a guided session yet.
+     */
+    @ElementCollection
+    @CollectionTable(name = "exercise_steps", joinColumns = @JoinColumn(name = "exercise_id"))
+    @OrderColumn(name = "step_order")
+    @Column(name = "instruction", length = 500)
+    private List<String> steps = List.of();
 
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
@@ -131,6 +147,10 @@ public class Exercise {
 
     public Integer getHoldAfterExhaleSeconds() {
         return holdAfterExhaleSeconds;
+    }
+
+    public List<String> getSteps() {
+        return steps;
     }
 
     public Instant getCreatedAt() {

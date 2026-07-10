@@ -22,6 +22,7 @@ const boxBreathing: Exercise = {
   holdAfterInhaleSeconds: 1,
   exhaleSeconds: 1,
   holdAfterExhaleSeconds: null,
+  steps: [],
 }
 
 describe('BreathingSession', () => {
