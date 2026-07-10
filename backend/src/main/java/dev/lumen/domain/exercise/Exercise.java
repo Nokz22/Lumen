@@ -37,6 +37,24 @@ public class Exercise {
     @Column(nullable = false, length = 1000)
     private String rationale;
 
+    /**
+     * Guided breathing pattern, in seconds per phase. Populated only for BREATHING
+     * category exercises; null for every other category (no guided session yet).
+     * A zero or null hold-after-exhale means the pattern has no fourth phase (e.g. 4-7-8
+     * breathing), as opposed to box breathing's four equal phases.
+     */
+    @Column(name = "inhale_seconds")
+    private Integer inhaleSeconds;
+
+    @Column(name = "hold_after_inhale_seconds")
+    private Integer holdAfterInhaleSeconds;
+
+    @Column(name = "exhale_seconds")
+    private Integer exhaleSeconds;
+
+    @Column(name = "hold_after_exhale_seconds")
+    private Integer holdAfterExhaleSeconds;
+
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
@@ -49,12 +67,29 @@ public class Exercise {
             int durationMinutes,
             ExerciseIntensity intensity,
             String rationale) {
+        this(category, name, durationMinutes, intensity, rationale, null, null, null, null);
+    }
+
+    public Exercise(
+            ExerciseCategory category,
+            String name,
+            int durationMinutes,
+            ExerciseIntensity intensity,
+            String rationale,
+            Integer inhaleSeconds,
+            Integer holdAfterInhaleSeconds,
+            Integer exhaleSeconds,
+            Integer holdAfterExhaleSeconds) {
         this.id = UUID.randomUUID();
         this.category = category;
         this.name = name;
         this.durationMinutes = durationMinutes;
         this.intensity = intensity;
         this.rationale = rationale;
+        this.inhaleSeconds = inhaleSeconds;
+        this.holdAfterInhaleSeconds = holdAfterInhaleSeconds;
+        this.exhaleSeconds = exhaleSeconds;
+        this.holdAfterExhaleSeconds = holdAfterExhaleSeconds;
         this.createdAt = Instant.now();
     }
 
@@ -80,6 +115,22 @@ public class Exercise {
 
     public String getRationale() {
         return rationale;
+    }
+
+    public Integer getInhaleSeconds() {
+        return inhaleSeconds;
+    }
+
+    public Integer getHoldAfterInhaleSeconds() {
+        return holdAfterInhaleSeconds;
+    }
+
+    public Integer getExhaleSeconds() {
+        return exhaleSeconds;
+    }
+
+    public Integer getHoldAfterExhaleSeconds() {
+        return holdAfterExhaleSeconds;
     }
 
     public Instant getCreatedAt() {

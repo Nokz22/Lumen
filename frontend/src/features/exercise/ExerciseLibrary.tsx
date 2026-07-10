@@ -1,12 +1,26 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import { useCompleteExercise, useExercises } from './useExercises'
+import { BreathingSession } from './BreathingSession'
+import type { Exercise } from '../../types/exercise'
 
 export function ExerciseLibrary() {
   const { t } = useTranslation()
   const { user } = useAuth()
   const { data, isLoading, isError } = useExercises()
   const completeExercise = useCompleteExercise(user!.id)
+  const [activeSession, setActiveSession] = useState<Exercise | null>(null)
+
+  if (activeSession) {
+    return (
+      <BreathingSession
+        exercise={activeSession}
+        onFinish={() => completeExercise.mutate({ exerciseId: activeSession.id })}
+        onClose={() => setActiveSession(null)}
+      />
+    )
+  }
 
   return (
     <section className="flex flex-col gap-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6">
@@ -35,14 +49,25 @@ export function ExerciseLibrary() {
                 {t('exercise.durationMinutes', { minutes: exercise.durationMinutes })}
               </span>
               <span>{exercise.rationale}</span>
-              <button
-                type="button"
-                onClick={() => completeExercise.mutate({ exerciseId: exercise.id })}
-                disabled={completeExercise.isPending}
-                className="mt-2 self-start rounded-full border border-[var(--color-border)] px-4 py-1.5 text-xs disabled:opacity-60"
-              >
-                {t('exercise.markDone')}
-              </button>
+              <div className="mt-2 flex gap-2">
+                {exercise.inhaleSeconds && (
+                  <button
+                    type="button"
+                    onClick={() => setActiveSession(exercise)}
+                    className="self-start rounded-full bg-[var(--color-accent)] px-4 py-1.5 text-xs text-[var(--color-accent-contrast)]"
+                  >
+                    {t('exercise.start')}
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => completeExercise.mutate({ exerciseId: exercise.id })}
+                  disabled={completeExercise.isPending}
+                  className="self-start rounded-full border border-[var(--color-border)] px-4 py-1.5 text-xs disabled:opacity-60"
+                >
+                  {t('exercise.markDone')}
+                </button>
+              </div>
             </li>
           ))}
         </ul>

@@ -10,6 +10,10 @@ export interface Exercise {
   durationMinutes: number
   intensity: ExerciseIntensity
   rationale: string
+  inhaleSeconds: number | null
+  holdAfterInhaleSeconds: number | null
+  exhaleSeconds: number | null
+  holdAfterExhaleSeconds: number | null
 }
 
 export interface ExerciseCompletion {

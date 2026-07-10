@@ -131,6 +131,7 @@
   },
   "exercise": {
     "markDone": "Marcar como feito",
+    "start": "Começar",
     "durationMinutes": "{{minutes}} min",
     "category": {
       "BREATHING": "Respiração",
@@ -145,6 +146,18 @@
       "loading": "A carregar a biblioteca de exercícios…",
       "empty": "Ainda não há exercícios disponíveis.",
       "error": "Não foi possível carregar a biblioteca. Tenta novamente."
+    },
+    "session": {
+      "title": "Sessão guiada: {{name}}",
+      "exit": "Sair",
+      "completed": "Muito bem.",
+      "progress": "{{phase}} · ciclo {{cycle}} de {{totalCycles}}",
+      "phase": {
+        "INHALE": "Inspira",
+        "HOLD_AFTER_INHALE": "Segura",
+        "EXHALE": "Expira",
+        "HOLD_AFTER_EXHALE": "Segura"
+      }
     }
   },
   "recommendation": {
