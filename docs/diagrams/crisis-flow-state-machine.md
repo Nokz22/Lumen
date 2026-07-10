@@ -23,7 +23,7 @@ stateDiagram-v2
     note right of DETECTED
         ACKNOWLEDGED nunca é atingido
         diretamente a partir de DETECTED
-        (invariante CLAUDE.md)
+        (invariante docs/constitution.md)
     end note
 ```
 

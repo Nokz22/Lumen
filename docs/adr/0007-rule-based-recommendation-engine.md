@@ -34,7 +34,7 @@ modelo treinado, nenhuma pontuação de confiança, nenhum A/B test de pesos.
 3. **Testabilidade direta.** `RecommendationServiceTest` testa cada regra isoladamente
    com `assertEquals`-style verificação — impossível de fazer com a mesma clareza
    sobre pesos de um modelo.
-4. **Simplicidade é o desempate por defeito** (CLAUDE.md) — 4 regras se leem numa
+4. **Simplicidade é o desempate por defeito** (docs/constitution.md) — 4 regras se leem numa
    função, não justificam a complexidade operacional de servir/versionar um modelo.
 
 **Alternativa rejeitada:** um motor de regras "configurável" (ex.: regras carregadas

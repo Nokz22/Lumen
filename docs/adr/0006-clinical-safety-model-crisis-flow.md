@@ -7,7 +7,7 @@
 ## Contexto
 
 A Fase 3 introduz o PHQ-9 e o GAD-7 e, com eles, o invariante mais crítico do projeto
-(`CLAUDE.md`): uma resposta positiva ao item 9 do PHQ-9 (pensamentos de morte ou
+(`docs/constitution.md`): uma resposta positiva ao item 9 do PHQ-9 (pensamentos de morte ou
 auto-dano) tem de interromper o fluxo normal, mostrar recursos de crise, e nunca
 mostrar uma pontuação como se fosse um resultado normal. Isto exige decisões de
 modelação que vão além do CRUD habitual — como é que "não mostrar a pontuação" se

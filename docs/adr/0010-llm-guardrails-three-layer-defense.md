@@ -7,7 +7,7 @@
 ## Contexto
 
 Esta é a fase que o brief chama "a mais sensível e mais diferenciadora" do projeto —
-um LLM real a conversar com alguém sobre o seu bem-estar. CLAUDE.md define os
+um LLM real a conversar com alguém sobre o seu bem-estar. docs/constitution.md define os
 invariantes que não podem falhar: o LLM nunca é invocado quando o classificador de
 risco de entrada dispara; a deteção de crise é independente da disponibilidade do
 LLM; conteúdo de chat nunca aparece em logs. Um modelo de linguagem generativo não é
@@ -38,7 +38,7 @@ compara contra ~28 frases PT+EN de risco de autoagressão/suicídio conhecidas �
 mesma filosofia do resto do projeto (regras simples e explicáveis, nunca caixa-preta,
 tal como o scoring do PHQ-9). A alternativa óbvia — usar o próprio LLM, ou um segundo
 modelo, para classificar risco — foi rejeitada por três razões: (1) um LLM pode estar
-em baixo, e a deteção de crise tem de sobreviver a isso (invariante do CLAUDE.md); (2)
+em baixo, e a deteção de crise tem de sobreviver a isso (invariante do docs/constitution.md); (2)
 uma chamada de classificação teria a mesma latência e custo que a conversa em si, a
 dobrar por turno; (3) uma decisão de "isto é uma crise ou não" tem de ser auditável e
 determinística — a mesma frase tem de disparar sempre, não depender de uma amostragem
@@ -75,7 +75,7 @@ texto é dividido em palavras e reenviado via WebSocket, simulando o efeito de
 streaming ao vivo. Isto é um desvio deliberado de "streaming literal": com reenvio
 token-a-token real, uma falha na verificação só seria apanhada depois de a pessoa já
 ter visto texto potencialmente inseguro no ecrã — o guardrail chegaria tarde demais.
-Segundo a ordem de desempate do CLAUDE.md ("Segurança clínica e Privacidade >
+Segundo a ordem de desempate do docs/constitution.md ("Segurança clínica e Privacidade >
 Clareza > ... > Performance"), um atraso perceptível de alguns segundos antes do
 "início" visual da resposta vale sempre mais do que a garantia de segurança.
 
@@ -91,7 +91,7 @@ Clareza > ... > Performance"), um atraso perceptível de alguns segundos antes d
 ## Consequências
 
 **Positivas:**
-- Os invariantes do CLAUDE.md são garantidos pela estrutura do código, não pela
+- Os invariantes do docs/constitution.md são garantidos pela estrutura do código, não pela
   disciplina de quem o edita no futuro — testável sem nunca chamar um LLM real.
 - A app funciona com segurança clínica intacta mesmo com o provider de LLM
   completamente indisponível.

@@ -149,6 +149,7 @@ docs/       project-brief, standards, ADRs, diagramas
 
 ## Documentação
 
+- [`docs/constitution.md`](docs/constitution.md) — regras não-negociáveis do projeto (fronteira ética, invariantes clínicos, quality attributes).
 - [`docs/project-brief.md`](docs/project-brief.md) — o quê e porquê, fases, domínio, fluxo de crise.
 - [`docs/standards.md`](docs/standards.md) — standards de engenharia, plano de commits e Definition of Done por fase.
 - [`docs/adr/`](docs/adr/) — Architecture Decision Records.
