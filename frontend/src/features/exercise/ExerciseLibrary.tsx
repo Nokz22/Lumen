@@ -3,7 +3,12 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import { useCompleteExercise, useExercises } from './useExercises'
 import { BreathingSession } from './BreathingSession'
+import { GuidedSession } from './GuidedSession'
 import type { Exercise } from '../../types/exercise'
+
+function hasGuidedSession(exercise: Exercise): boolean {
+  return Boolean(exercise.inhaleSeconds) || exercise.steps.length > 0
+}
 
 export function ExerciseLibrary() {
   const { t } = useTranslation()
@@ -13,12 +18,12 @@ export function ExerciseLibrary() {
   const [activeSession, setActiveSession] = useState<Exercise | null>(null)
 
   if (activeSession) {
-    return (
-      <BreathingSession
-        exercise={activeSession}
-        onFinish={() => completeExercise.mutate({ exerciseId: activeSession.id })}
-        onClose={() => setActiveSession(null)}
-      />
+    const onFinish = () => completeExercise.mutate({ exerciseId: activeSession.id })
+    const onClose = () => setActiveSession(null)
+    return activeSession.inhaleSeconds ? (
+      <BreathingSession exercise={activeSession} onFinish={onFinish} onClose={onClose} />
+    ) : (
+      <GuidedSession exercise={activeSession} onFinish={onFinish} onClose={onClose} />
     )
   }
 
@@ -50,7 +55,7 @@ export function ExerciseLibrary() {
               </span>
               <span>{exercise.rationale}</span>
               <div className="mt-2 flex gap-2">
-                {exercise.inhaleSeconds && (
+                {hasGuidedSession(exercise) && (
                   <button
                     type="button"
                     onClick={() => setActiveSession(exercise)}

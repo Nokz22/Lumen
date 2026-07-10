@@ -31,6 +31,9 @@ public class ExerciseService {
                 exercise.getInhaleSeconds(),
                 exercise.getHoldAfterInhaleSeconds(),
                 exercise.getExhaleSeconds(),
-                exercise.getHoldAfterExhaleSeconds());
+                exercise.getHoldAfterExhaleSeconds(),
+                // steps is lazily fetched; copy it while the session (and this transaction) is
+                // still open, otherwise Jackson fails to serialize it later
+                List.copyOf(exercise.getSteps()));
     }
 }

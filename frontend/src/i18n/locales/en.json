@@ -152,6 +152,7 @@
       "exit": "Exit",
       "completed": "Nicely done.",
       "progress": "{{phase}} · cycle {{cycle}} of {{totalCycles}}",
+      "step": "Step {{step}} of {{totalSteps}}",
       "phase": {
         "INHALE": "Breathe in",
         "HOLD_AFTER_INHALE": "Hold",

@@ -2,6 +2,7 @@ package dev.lumen.application.exercise;
 
 import dev.lumen.domain.exercise.ExerciseCategory;
 import dev.lumen.domain.exercise.ExerciseIntensity;
+import java.util.List;
 import java.util.UUID;
 
 public record ExerciseResponse(
@@ -14,5 +15,6 @@ public record ExerciseResponse(
         Integer inhaleSeconds,
         Integer holdAfterInhaleSeconds,
         Integer exhaleSeconds,
-        Integer holdAfterExhaleSeconds) {
+        Integer holdAfterExhaleSeconds,
+        List<String> steps) {
 }
