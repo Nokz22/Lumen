@@ -168,6 +168,12 @@ class AuthIntegrationTest {
     }
 
     @Test
+    void shouldRejectRefreshWithoutCookie() throws Exception {
+        mockMvc.perform(post("/api/v1/auth/refresh").with(csrf()))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     void shouldInvalidateRefreshTokenOnLogout() throws Exception {
         RegisterRequest registerRequest = newRegisterRequest();
         MvcResult registerResult = mockMvc.perform(post("/api/v1/auth/register")
