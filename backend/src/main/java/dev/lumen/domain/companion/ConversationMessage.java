@@ -15,7 +15,7 @@ import java.util.UUID;
  * userId is a plain UUID, not a JPA relation — same pattern as every other
  * high-volume, loosely-coupled table in this codebase (RiskEvent, AuditLogEntry,
  * WearableReading). content is cifrado at rest with the same converter MoodCheckIn.note
- * already uses (CLAUDE.md: "conteúdo emocional... nunca aparecem em logs" applies just
+ * already uses (docs/constitution.md: "conteúdo emocional... nunca aparecem em logs" applies just
  * as much to chat content).
  */
 @Entity

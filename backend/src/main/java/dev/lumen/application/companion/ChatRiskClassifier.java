@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Deliberately a transparent, auditable denylist — not a second model — so it keeps
- * working even when the LLM is completely unavailable (CLAUDE.md invariant) and its
+ * working even when the LLM is completely unavailable (docs/constitution.md invariant) and its
  * behavior can be read and defended line by line, the same design choice as the
  * PHQ-9 item 9 bright-line rule (project-brief.md §6.1: any value above zero
  * triggers). Bias is deliberately toward over-triggering: a false positive shows a

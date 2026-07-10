@@ -72,7 +72,7 @@ de verificação nas fases seguintes:
 **Positivas:**
 - Cada decisão futura (scoring, chat, UI) tem um critério de arbitragem claro: "isto
   aproxima-se de diagnóstico?" Se sim, para e questiona-se — como já fixado no
-  `CLAUDE.md` ("se eu pedir algo que aproxime a app de diagnóstico... para e avisa").
+  `docs/constitution.md` ("se eu pedir algo que aproxime a app de diagnóstico... para e avisa").
 - Dá ao projeto um argumento de entrevista forte e verificável: a fronteira ética não é
   uma frase de marketing, é uma decisão datada com trade-offs assumidos.
 - Cria a obrigação de recursos de crise por região desde o desenho (Fase 3), porque o

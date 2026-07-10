@@ -1,4 +1,4 @@
-# CLAUDE.md — Lumen
+# Constituição do projeto — Lumen
 
 Constituição do projeto. Lida em cada sessão. Detalhe completo em `docs/`.
 Mantém este ficheiro curto (< 200 linhas) e verificável.

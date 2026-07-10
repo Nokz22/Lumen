@@ -6,7 +6,7 @@
 
 ## Contexto
 
-Dados de saúde mental são categoria especial no RGPD (`CLAUDE.md`, `docs/standards.md`
+Dados de saúde mental são categoria especial no RGPD (`docs/constitution.md`, `docs/standards.md`
 §7). A Fase 1 já criou a entidade `ConsentRecord` (append-only) mas sem ciclo de vida
 nem ligação a nenhuma feature. A Fase 2 tem de tornar isto real: consentimento que
 efetivamente controla acesso, um audit log de acessos, e cifra do único campo de texto
