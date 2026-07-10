@@ -14,7 +14,7 @@ ativo → ameaça → mitigação, revista à medida que features novas introduz
 | Dados de humor de um USER | ADMIN ou outro USER acede a dados que não são seus | `@PreAuthorize` self-scoped em `MoodCheckInController`/`ConsentController` — identidade, não papel; testado (`shouldPreventAdminFromReadingUserMoodCheckIns`) |
 | Rotas admin (`/api/v1/admin/**`) | Escalada de privilégio | `hasRole("ADMIN")` ao nível do filter chain, não por endpoint individual |
 | Registo de conta | Menores de idade a registarem-se | Verificação de idade 18+ no `AuthService.register`, servidor é a fonte de verdade (cliente também valida, por UX) |
-| Logs da aplicação | PII/conteúdo sensível acidental | Regra dura (Nível 0, `CLAUDE.md`): nunca logar conteúdo emocional, respostas de instrumentos, tokens; SLF4J sempre |
+| Logs da aplicação | PII/conteúdo sensível acidental | Regra dura (Nível 0, `docs/constitution.md`): nunca logar conteúdo emocional, respostas de instrumentos, tokens; SLF4J sempre |
 
 **Não fazemos** (decisão consciente, `docs/standards.md` §15): STRIDE exaustivo, KMS
 gerido, pentest — práticas de equipa com produto em produção real, fora de escopo de

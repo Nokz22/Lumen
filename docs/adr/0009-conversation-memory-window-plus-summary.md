@@ -55,7 +55,7 @@ substanciais. Aceite como dívida técnica: ver secção de Consequências.
 
 Reaproveita o `EncryptedStringConverter` já existente de `domain.moodcheckin`
 (AES-GCM, `@Convert` na entidade) — conteúdo emocional de chat é tão sensível quanto
-uma nota de check-in ou uma resposta de PHQ-9 (CLAUDE.md: "conteúdo emocional...
+uma nota de check-in ou uma resposta de PHQ-9 (docs/constitution.md: "conteúdo emocional...
 nunca aparecem em logs" aplica-se aqui da mesma forma).
 
 ## Alternativas rejeitadas
@@ -65,7 +65,7 @@ nunca aparecem em logs" aplica-se aqui da mesma forma).
 - **Retrieval sobre embeddings/vector store.** Traria memória "semântica" mais
   sofisticada, mas obriga a uma nova peça de infraestrutura (base vetorial) sem
   justificação no brief para o âmbito deste projeto de portfólio — complexidade não
-  ganha aqui (CLAUDE.md: "simplicidade é o desempate por defeito").
+  ganha aqui (docs/constitution.md: "simplicidade é o desempate por defeito").
 
 ## Consequências
 

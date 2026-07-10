@@ -20,7 +20,7 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
- * The one method in the whole codebase that most directly implements CLAUDE.md's
+ * The one method in the whole codebase that most directly implements docs/constitution.md's
  * defining invariant: "O LLM NUNCA é invocado quando o classificador de risco de
  * entrada dispara." The risk check happens before anything that could call the LLM
  * even exists in the call stack — see submitMessage(). The async LLM call is

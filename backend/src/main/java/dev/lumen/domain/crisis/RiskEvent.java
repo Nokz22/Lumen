@@ -16,7 +16,7 @@ import java.util.UUID;
  * read back, and assessmentId must stay nullable for future non-assessment triggers
  * (e.g. a chat risk classifier in Fase 6).
  *
- * <p>Invariant enforced here (CLAUDE.md): ACKNOWLEDGED is only reachable from
+ * <p>Invariant enforced here (docs/constitution.md): ACKNOWLEDGED is only reachable from
  * RESOURCES_PRESENTED, never directly from DETECTED.
  */
 @Entity

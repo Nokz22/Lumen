@@ -32,7 +32,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 /**
  * The most important tests in the whole codebase: they exist to make it impossible
- * for a future change to silently break CLAUDE.md's defining invariant — "O LLM
+ * for a future change to silently break docs/constitution.md's defining invariant — "O LLM
  * NUNCA é invocado quando o classificador de risco de entrada dispara" — without a
  * test failing.
  */

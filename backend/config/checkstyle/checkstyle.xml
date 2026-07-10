@@ -58,7 +58,7 @@
     <module name="SimplifyBooleanReturn"/>
     <module name="RegexpSinglelineJava">
       <property name="format" value="System\.(out|err)\.print"/>
-      <property name="message" value="Use SLF4J instead of System.out/err — see CLAUDE.md logging rule"/>
+      <property name="message" value="Use SLF4J instead of System.out/err — see docs/constitution.md logging rule"/>
     </module>
   </module>
 </module>
