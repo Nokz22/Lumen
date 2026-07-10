@@ -27,6 +27,10 @@ public class ExerciseService {
                 exercise.getName(),
                 exercise.getDurationMinutes(),
                 exercise.getIntensity(),
-                exercise.getRationale());
+                exercise.getRationale(),
+                exercise.getInhaleSeconds(),
+                exercise.getHoldAfterInhaleSeconds(),
+                exercise.getExhaleSeconds(),
+                exercise.getHoldAfterExhaleSeconds());
     }
 }

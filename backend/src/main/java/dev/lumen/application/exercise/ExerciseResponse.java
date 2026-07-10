@@ -10,5 +10,9 @@ public record ExerciseResponse(
         String name,
         int durationMinutes,
         ExerciseIntensity intensity,
-        String rationale) {
+        String rationale,
+        Integer inhaleSeconds,
+        Integer holdAfterInhaleSeconds,
+        Integer exhaleSeconds,
+        Integer holdAfterExhaleSeconds) {
 }

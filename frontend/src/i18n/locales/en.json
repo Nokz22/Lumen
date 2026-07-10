@@ -131,6 +131,7 @@
   },
   "exercise": {
     "markDone": "Mark as done",
+    "start": "Start",
     "durationMinutes": "{{minutes}} min",
     "category": {
       "BREATHING": "Breathing",
@@ -145,6 +146,18 @@
       "loading": "Loading the exercise library…",
       "empty": "No exercises available yet.",
       "error": "Couldn't load the exercise library. Please try again."
+    },
+    "session": {
+      "title": "Guided session: {{name}}",
+      "exit": "Exit",
+      "completed": "Nicely done.",
+      "progress": "{{phase}} · cycle {{cycle}} of {{totalCycles}}",
+      "phase": {
+        "INHALE": "Breathe in",
+        "HOLD_AFTER_INHALE": "Hold",
+        "EXHALE": "Breathe out",
+        "HOLD_AFTER_EXHALE": "Hold"
+      }
     }
   },
   "recommendation": {
