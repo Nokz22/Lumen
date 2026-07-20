@@ -37,7 +37,7 @@ dependencies {
 	implementation 'org.flywaydb:flyway-database-postgresql'
 	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
 	implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
-	implementation 'com.anthropic:anthropic-java:2.48.0'
+	implementation 'com.anthropic:anthropic-java:2.49.0'
 	implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.4.0'
 	implementation 'io.github.resilience4j:resilience4j-all:2.4.0'
 	runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
