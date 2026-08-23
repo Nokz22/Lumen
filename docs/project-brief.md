@@ -1,10 +1,9 @@
-# PROMPT — LUMEN · Plataforma de Bem-Estar Corpo-Mente
+# LUMEN · Plataforma de Bem-Estar Corpo-Mente
 
-> Copia tudo abaixo desta linha e cola no teu assistente de código (Claude Code, etc.).
-> Este documento define **o quê** e **porquê**. O documento `lumen-engineering-standards.md`
-> (standards de engenharia) define **como** — ambos se aplicam, e em caso de conflito
-> sobre segurança clínica, **este documento prevalece**.
-> Trabalha **uma fase de cada vez**. Nunca peças o projeto todo de uma vez.
+> Este documento define **o quê** e **porquê**. O `standards.md` (standards de
+> engenharia) define **como** — ambos se aplicam, e em caso de conflito sobre
+> segurança clínica, **este documento prevalece**.
+> O projeto é construído **uma fase de cada vez**, nunca de uma só vez.
 
 ---
 
@@ -12,15 +11,15 @@
 
 Sou developer júnior com foco em **Java 17 + Spring Boot 3** e uma licenciatura em
 Psicologia. O Lumen é o meu projeto-bandeira: cruza engenharia de software séria com
-o meu domínio clínico. Trata-me como um par — explica cada decisão como farias a um
-colega que quer *defender o código numa entrevista técnica*, não copiar-cola cego.
+o meu domínio clínico. Cada decisão aqui é tomada para ser *defendida numa entrevista
+técnica* — nunca copiada de um tutorial sem perceber o porquê.
 
-Constrói por fases, com commits pequenos e incrementais (Conventional Commits), e no
-fim de cada bloco lógico sugere a mensagem de commit. Eu faço o commit manualmente.
+O projeto é construído por fases, com commits pequenos e incrementais
+(Conventional Commits), um por unidade lógica de trabalho.
 
-**Regra de trabalho:** se eu pedir algo que contrarie a fronteira ética da secção 1
-ou as boas práticas dos standards, **para e avisa-me antes de implementar.** Neste
-projeto, "o utilizador pediu" nunca é justificação suficiente.
+**Regra de trabalho:** nada entra no projeto se contrariar a fronteira ética da
+secção 1 ou os standards de engenharia — mesmo que seja mais rápido ou mais
+conveniente. Neste projeto, "dava jeito" nunca é justificação suficiente.
 
 ---
 
@@ -412,6 +411,6 @@ percebe de engenharia séria e percebe o domínio clínico por dentro. É raro."
 
 ---
 
-Começa pela **Fase 0**: mostra-me a estrutura de pastas proposta, o plano de commits
-da fase, e o rascunho do **ADR-001 (fronteira ética)** para eu validar **antes** de
-escreveres qualquer código.
+O projeto arranca na **Fase 0**, e por esta ordem: estrutura de pastas, plano de
+commits da fase, e o **ADR-001 (fronteira ética)** escrito e validado **antes** da
+primeira linha de código de domínio.
