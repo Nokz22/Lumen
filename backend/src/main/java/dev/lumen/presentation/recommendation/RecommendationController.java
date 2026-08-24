@@ -2,6 +2,7 @@ package dev.lumen.presentation.recommendation;
 
 import dev.lumen.application.recommendation.RecommendationService;
 import dev.lumen.application.recommendation.RecommendationSummaryResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,6 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
  * Used for the initial page load; live updates after that arrive over WebSocket
  * (see infrastructure.websocket.WebSocketRecommendationNotifier) rather than polling.
  */
+@Tag(
+        name = "Recommendations",
+        description = "Deterministic, rule-based suggestions, each carrying the explanation of why it was suggested"
+                + " (ADR-0007). Also pushed live over WebSocket.")
 @RestController
 @RequestMapping("/api/v1/users/{userId}/recommendations")
 @PreAuthorize("#userId == authentication.principal.userId()")

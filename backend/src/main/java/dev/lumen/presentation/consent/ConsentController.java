@@ -3,6 +3,7 @@ package dev.lumen.presentation.consent;
 import dev.lumen.application.consent.ConsentService;
 import dev.lumen.domain.user.ConsentType;
 import dev.lumen.presentation.consent.dto.ConsentStatusResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,6 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(
+        name = "Consent",
+        description = "Granular, revocable consent per processing purpose. Revoking disables the dependent feature in"
+                + " the same request cycle (ADR-0005).")
 @RestController
 @RequestMapping("/api/v1/users/{userId}/consents/{consentType}")
 @PreAuthorize("#userId == authentication.principal.userId()")

@@ -2,6 +2,7 @@ package dev.lumen.presentation.wearable;
 
 import dev.lumen.application.wearable.CorrelationInsight;
 import dev.lumen.application.wearable.WearableInsightService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -10,6 +11,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(
+        name = "Wearable insights",
+        description = "Correlation between physiological signal and self-reported mood. Insight, never a clinical"
+                + " verdict.")
 @RestController
 @RequestMapping("/api/v1/users/{userId}/wearable-insights")
 @PreAuthorize("#userId == authentication.principal.userId()")

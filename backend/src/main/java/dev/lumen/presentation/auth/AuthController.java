@@ -7,6 +7,7 @@ import dev.lumen.application.user.UserQueryService;
 import dev.lumen.application.user.UserSummaryResponse;
 import dev.lumen.presentation.auth.dto.LoginRequest;
 import dev.lumen.presentation.auth.dto.RegisterRequest;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.time.Duration;
@@ -23,6 +24,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(
+        name = "Authentication",
+        description = "Registration with an 18+ age gate, login, refresh-token rotation and logout. Tokens travel as"
+                + " httpOnly cookies (ADR-0004).")
 @RestController
 @RequestMapping("/api/v1/auth")
 public class AuthController {

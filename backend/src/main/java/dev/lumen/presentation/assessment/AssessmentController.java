@@ -5,6 +5,8 @@ import dev.lumen.application.assessment.AssessmentSubmissionResult;
 import dev.lumen.application.assessment.AssessmentSummaryResponse;
 import dev.lumen.domain.assessment.AssessmentType;
 import dev.lumen.presentation.assessment.dto.SubmitAssessmentRequest;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -21,6 +23,10 @@ import org.springframework.web.bind.annotation.RestController;
  * (AssessmentSubmissionResult) — the two shapes are deliberately different JSON
  * payloads so a crisis response can never be mistaken for a normal score.
  */
+@Tag(
+        name = "Wellbeing instruments",
+        description = "PHQ-9 and GAD-7 with official scoring, expressed in wellbeing language and never as a diagnostic"
+                + " label. Monthly cadence.")
 @RestController
 @RequestMapping("/api/v1/users/{userId}/assessments")
 @PreAuthorize("#userId == authentication.principal.userId()")
@@ -33,6 +39,12 @@ public class AssessmentController {
     }
 
     @PostMapping("/{assessmentType}")
+    @Operation(
+            summary = "Submit a completed instrument",
+            description = "Returns one of two deliberately different payloads. A positive answer to PHQ-9 item 9 halts"
+                    + " scoring entirely and returns a crisis interrupt carrying the region's support resources; only a"
+                    + " submission with no risk signal returns a score. The score is never computed first and then"
+                    + " withheld — the halt happens before scoring (ADR-0006).")
     public AssessmentSubmissionResult submit(
             @PathVariable UUID userId,
             @PathVariable AssessmentType assessmentType,
