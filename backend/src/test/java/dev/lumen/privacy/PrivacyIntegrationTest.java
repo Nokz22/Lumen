@@ -205,6 +205,27 @@ class PrivacyIntegrationTest {
                 .isEqualTo(1);
     }
 
+    /**
+     * Regression guard. The audit insert happens inside the export's own transaction, and
+     * marking that transaction read-only leaves Hibernate in FlushMode.MANUAL, which drops
+     * the insert with no error at all — the access reads as recorded while nothing is.
+     */
+    @Test
+    void shouldRecordTheExportInTheAuditTrail() throws Exception {
+        AuthenticatedUser user = registerUserWithConsent();
+
+        mockMvc.perform(get("/api/v1/users/{userId}/privacy/export", user.userId())
+                        .cookie(user.accessTokenCookie()))
+                .andExpect(status().isOk());
+
+        assertThat(jdbcTemplate.queryForObject(
+                        "SELECT count(*) FROM audit_log_entries WHERE subject_user_id = ?"
+                                + " AND action = 'EXPORT_PERSONAL_DATA'",
+                        Integer.class,
+                        user.userId()))
+                .isEqualTo(1);
+    }
+
     @Test
     void shouldForbidExportingOrErasingAnotherPersonsAccount() throws Exception {
         AuthenticatedUser userA = registerUserWithConsent();

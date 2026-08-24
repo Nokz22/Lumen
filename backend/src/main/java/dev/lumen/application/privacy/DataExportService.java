@@ -85,7 +85,10 @@ public class DataExportService {
         this.auditLogService = auditLogService;
     }
 
-    @Transactional(readOnly = true)
+    // Not readOnly, despite reading: it writes the audit entry. A read-only transaction
+    // puts Hibernate in FlushMode.MANUAL, and the audit insert is then silently dropped
+    // at commit — the access looks recorded and is not.
+    @Transactional
     public UserDataExport export(UUID userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         auditLogService.record(userId, userId, AuditAction.EXPORT_PERSONAL_DATA);

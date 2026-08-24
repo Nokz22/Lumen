@@ -90,7 +90,10 @@ public class MoodCheckInService {
         }
     }
 
-    @Transactional(readOnly = true)
+    // Not readOnly: this records a VIEW_MOOD_HISTORY audit entry, and a read-only
+    // transaction leaves Hibernate in FlushMode.MANUAL, which drops that insert without
+    // an error. Marking it read-only made the audit log quietly stop recording reads.
+    @Transactional
     public List<MoodCheckInResponse> getHistory(UUID userId) {
         if (userRepository.findById(userId).isEmpty()) {
             throw new UserNotFoundException(userId);
