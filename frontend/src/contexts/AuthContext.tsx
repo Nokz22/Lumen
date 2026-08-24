@@ -13,6 +13,12 @@ interface AuthContextValue {
   login: (payload: LoginRequest) => Promise<void>
   register: (payload: RegisterRequest) => Promise<void>
   logout: () => Promise<void>
+  /**
+   * Drops the in-memory session without calling the logout endpoint. Used after account
+   * erasure, where the server already cleared the cookies and there is no longer an
+   * account for a logout request to act on.
+   */
+  clearSession: () => void
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined)
@@ -41,8 +47,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null)
   }
 
+  function clearSession() {
+    setUser(null)
+  }
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, login, register, logout, clearSession }}>
       {children}
     </AuthContext.Provider>
   )

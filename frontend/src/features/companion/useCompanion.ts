@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { fetchConversationHistory, sendMessage } from '../../api/companion'
-import { fetchCompanionConsent, grantCompanionConsent } from '../../api/companionConsent'
+import { fetchConsent, grantConsent } from '../../api/consents'
 import { acknowledgeRiskEvent } from '../../api/riskEvents'
 
 const companionConsentKey = (userId: string) => ['companion-consent', userId]
@@ -9,7 +9,7 @@ export const conversationHistoryKey = (userId: string) => ['conversation-history
 export function useCompanionConsent(userId: string) {
   return useQuery({
     queryKey: companionConsentKey(userId),
-    queryFn: () => fetchCompanionConsent(userId),
+    queryFn: () => fetchConsent(userId, 'LLM_PROCESSING'),
   })
 }
 
@@ -17,7 +17,7 @@ export function useGrantCompanionConsent(userId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: () => grantCompanionConsent(userId),
+    mutationFn: () => grantConsent(userId, 'LLM_PROCESSING'),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: companionConsentKey(userId) })
     },

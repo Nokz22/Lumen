@@ -37,7 +37,8 @@
   },
   "nav": {
     "dashboard": "Dashboard",
-    "companion": "Companion"
+    "companion": "Companion",
+    "privacy": "Privacy"
   },
   "auth": {
     "login": {
@@ -203,5 +204,45 @@
     "inputPlaceholder": "Write a message…",
     "send": "Send",
     "sendError": "Couldn't send your message. Please try again."
+  },
+  "privacy": {
+    "title": "Privacy and your data",
+    "subtitle": "What Lumen holds about you, what it is allowed to do with it, and how to take it back.",
+    "consents": {
+      "title": "Consent",
+      "description": "Each purpose is separate and every one can be withdrawn. Withdrawing pauses that feature — the rest of Lumen keeps working, and nothing you have already logged is deleted.",
+      "loading": "Checking…",
+      "error": "Couldn't load this setting.",
+      "grant": "Grant",
+      "revoke": "Withdraw",
+      "HEALTH_DATA_PROCESSING": {
+        "title": "Wellbeing data",
+        "description": "Lets you record mood, energy and sleep, and see your own history. Without it, check-ins pause."
+      },
+      "LLM_PROCESSING": {
+        "title": "AI companion",
+        "description": "Sends your chat messages to a third-party language model. Without it, the companion is unavailable and the rest of Lumen is unaffected."
+      },
+      "WEARABLE_INGESTION": {
+        "title": "Wearable signals",
+        "description": "Lets Lumen take in heart rate, HRV, sleep and steps, and relate them to what you report. Without it, no physiological data is stored."
+      }
+    },
+    "export": {
+      "title": "Download your data",
+      "description": "Everything Lumen holds about you as a single JSON file — check-ins, questionnaire answers and scores, recommendations, wearable readings and your conversation. Available whether or not your consents are currently active.",
+      "submit": "Download",
+      "pending": "Preparing your file…",
+      "success": "Your file has been downloaded.",
+      "error": "Couldn't prepare your file. Please try again."
+    },
+    "erase": {
+      "title": "Delete your account",
+      "description": "Permanently deletes your account and every piece of data attached to it. This cannot be undone, and there is no grace period.",
+      "confirmationLabel": "Type {{phrase}} to confirm",
+      "submit": "Delete my account",
+      "pending": "Deleting…",
+      "error": "Couldn't delete your account. Please try again."
+    }
   }
 }

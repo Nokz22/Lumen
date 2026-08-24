@@ -15,12 +15,14 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="mx-auto flex min-h-svh max-w-2xl flex-col gap-8 px-4 py-8">
-      <header className="flex items-center justify-between gap-4">
-        <div>
+      {/* Wraps rather than compressing: a third nav item squeezed the tagline into three
+          lines at this max width, and it only gets worse on a narrow phone. */}
+      <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
+        <div className="min-w-0">
           <h1 className="text-2xl font-semibold">{t('app.title')}</h1>
           <p className="text-sm text-[var(--color-text-muted)]">{t('app.tagline')}</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
           {user && (
             <nav className="flex items-center gap-2">
               <NavLink to="/" end className={navLinkClassName}>
@@ -28,6 +30,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
               </NavLink>
               <NavLink to="/companion" className={navLinkClassName}>
                 {t('nav.companion')}
+              </NavLink>
+              <NavLink to="/privacy" className={navLinkClassName}>
+                {t('nav.privacy')}
               </NavLink>
             </nav>
           )}
