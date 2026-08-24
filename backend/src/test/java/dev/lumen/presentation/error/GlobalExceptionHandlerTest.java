@@ -21,6 +21,14 @@ class GlobalExceptionHandlerTest {
         assertThat(problem.getDetail()).doesNotContain("secret");
     }
 
+    /** A signed-out visitor's silent refresh is an ordinary event, not a server fault. */
+    @Test
+    void shouldMapAMissingAuthCookieToUnauthorizedRatherThanServerError() {
+        ProblemDetail problem = handler.handleMissingAuthCookie();
+
+        assertThat(problem.getStatus()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
+    }
+
     @Test
     void shouldMapAccessDeniedToForbidden() {
         ProblemDetail problem = handler.handleAccessDenied();

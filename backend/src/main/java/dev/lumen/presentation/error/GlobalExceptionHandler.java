@@ -21,6 +21,7 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -71,6 +72,17 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({InvalidCredentialsException.class, InvalidRefreshTokenException.class})
     public ProblemDetail handleAuthenticationFailure(RuntimeException exception) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, exception.getMessage());
+    }
+
+    /**
+     * A refresh request with no refresh cookie is an expired or absent session, not a
+     * server fault. Without this it fell through to handleUnexpected and answered 500 —
+     * with a stack trace logged at ERROR — on the most ordinary path there is: a signed-out
+     * visitor opening the app, whose silent refresh has nothing to send.
+     */
+    @ExceptionHandler(MissingRequestCookieException.class)
+    public ProblemDetail handleMissingAuthCookie() {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, "Not authenticated");
     }
 
     @ExceptionHandler(ConsentRequiredException.class)
