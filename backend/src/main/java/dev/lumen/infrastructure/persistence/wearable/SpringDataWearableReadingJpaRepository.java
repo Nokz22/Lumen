@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -19,5 +20,7 @@ interface SpringDataWearableReadingJpaRepository extends JpaRepository<WearableR
     List<WearableReading> findByUserIdAndRecordedAtBetween(
             @Param("userId") UUID userId, @Param("since") Instant since, @Param("until") Instant until);
 
-    void deleteByUserId(UUID userId);
+    @Modifying
+    @Query("DELETE FROM WearableReading w WHERE w.userId = :userId")
+    void deleteByUserId(@Param("userId") UUID userId);
 }

@@ -32,9 +32,15 @@ import org.springframework.transaction.annotation.Transactional;
  * whole thing rolls back and the caller gets an error.
  *
  * <p>Deletion order is dictated by the foreign keys, not by preference: children before
- * parents, all the way down to the user row. What survives is the audit trail, which after
- * this runs holds nothing but opaque UUIDs that no longer resolve to a person — see
- * ADR-0011 for why that is erasure and not a leftover.
+ * parents, all the way down to the user row. Every repository delete behind this is an
+ * explicit bulk statement rather than a derived Spring Data method, and that is load-bearing
+ * — a derived delete loads the rows and queues their removal in the persistence context,
+ * which Hibernate then flushes in its own order, ignoring the order they were called in.
+ * Mixing the two styles fails against the database with a constraint violation.
+ *
+ * <p>What survives is the audit trail, which after this runs holds nothing but opaque UUIDs
+ * that no longer resolve to a person — see ADR-0011 for why that is erasure and not a
+ * leftover.
  */
 @Service
 public class AccountErasureService {

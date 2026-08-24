@@ -4,6 +4,7 @@ import dev.lumen.domain.companion.ConversationMessage;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -12,5 +13,7 @@ interface SpringDataConversationMessageJpaRepository extends JpaRepository<Conve
     @Query("SELECT m FROM ConversationMessage m WHERE m.userId = :userId ORDER BY m.createdAt ASC")
     List<ConversationMessage> findByUserIdOrderByCreatedAtAsc(@Param("userId") UUID userId);
 
-    void deleteByUserId(UUID userId);
+    @Modifying
+    @Query("DELETE FROM ConversationMessage m WHERE m.userId = :userId")
+    void deleteByUserId(@Param("userId") UUID userId);
 }
