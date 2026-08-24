@@ -181,6 +181,7 @@ The reasoning behind every non-obvious choice is written down as it's made, not 
 | [0008](docs/adr/0008-provider-agnostic-wearable-ingestion.md) | Provider-agnostic wearable ingestion — simulator first, real adapters swap in later |
 | [0009](docs/adr/0009-conversation-memory-window-plus-summary.md) | Conversation memory as a fixed window + rolling summary, never full history replay |
 | [0010](docs/adr/0010-llm-guardrails-three-layer-defense.md) | Three-layer LLM defense — safety is never delegated to the model itself |
+| [0011](docs/adr/0011-data-subject-rights-export-and-erasure.md) | Data-subject rights — export is not gated on consent, erasure is real deletion |
 
 Full list, including infrastructure-level decisions (Flyway, MapStruct): **[docs/adr/](docs/adr/)**.
 
