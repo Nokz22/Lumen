@@ -10,11 +10,7 @@ import dev.lumen.presentation.auth.dto.RegisterRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import java.time.Duration;
-import java.time.Instant;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,16 +28,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/auth")
 public class AuthController {
 
-    private static final String ACCESS_TOKEN_COOKIE = "access_token";
-    private static final String REFRESH_TOKEN_COOKIE = "refresh_token";
-    private static final String REFRESH_TOKEN_PATH = "/api/v1/auth";
+    private static final String REFRESH_TOKEN_COOKIE = AuthCookies.REFRESH_TOKEN_COOKIE;
 
     private final AuthService authService;
     private final UserQueryService userQueryService;
+    private final AuthCookies authCookies;
 
-    public AuthController(AuthService authService, UserQueryService userQueryService) {
+    public AuthController(AuthService authService, UserQueryService userQueryService, AuthCookies authCookies) {
         this.authService = authService;
         this.userQueryService = userQueryService;
+        this.authCookies = authCookies;
     }
 
     @PostMapping("/register")
@@ -54,21 +50,21 @@ public class AuthController {
                 request.locale(),
                 request.region(),
                 request.dateOfBirth());
-        setAuthCookies(response, tokens);
+        authCookies.set(response, tokens);
         return userQueryService.getSummary(tokens.userId());
     }
 
     @PostMapping("/login")
     public UserSummaryResponse login(@Valid @RequestBody LoginRequest request, HttpServletResponse response) {
         AuthTokens tokens = authService.login(request.email(), request.password());
-        setAuthCookies(response, tokens);
+        authCookies.set(response, tokens);
         return userQueryService.getSummary(tokens.userId());
     }
 
     @PostMapping("/refresh")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void refresh(@CookieValue(REFRESH_TOKEN_COOKIE) String refreshToken, HttpServletResponse response) {
-        setAuthCookies(response, authService.refresh(refreshToken));
+        authCookies.set(response, authService.refresh(refreshToken));
     }
 
     @PostMapping("/logout")
@@ -79,49 +75,11 @@ public class AuthController {
         if (refreshToken != null) {
             authService.logout(refreshToken);
         }
-        clearAuthCookies(response);
+        authCookies.clear(response);
     }
 
     @GetMapping("/me")
     public UserSummaryResponse me(@AuthenticationPrincipal AuthenticatedPrincipal principal) {
         return userQueryService.getSummary(principal.userId());
-    }
-
-    private void setAuthCookies(HttpServletResponse response, AuthTokens tokens) {
-        Instant now = Instant.now();
-        response.addHeader(
-                HttpHeaders.SET_COOKIE,
-                buildCookie(
-                                ACCESS_TOKEN_COOKIE,
-                                tokens.accessToken(),
-                                "/",
-                                Duration.between(now, tokens.accessTokenExpiresAt()))
-                        .toString());
-        response.addHeader(
-                HttpHeaders.SET_COOKIE,
-                buildCookie(
-                                REFRESH_TOKEN_COOKIE,
-                                tokens.refreshToken(),
-                                REFRESH_TOKEN_PATH,
-                                Duration.between(now, tokens.refreshTokenExpiresAt()))
-                        .toString());
-    }
-
-    private void clearAuthCookies(HttpServletResponse response) {
-        response.addHeader(
-                HttpHeaders.SET_COOKIE, buildCookie(ACCESS_TOKEN_COOKIE, "", "/", Duration.ZERO).toString());
-        response.addHeader(
-                HttpHeaders.SET_COOKIE,
-                buildCookie(REFRESH_TOKEN_COOKIE, "", REFRESH_TOKEN_PATH, Duration.ZERO).toString());
-    }
-
-    private ResponseCookie buildCookie(String name, String value, String path, Duration maxAge) {
-        return ResponseCookie.from(name, value)
-                .httpOnly(true)
-                .secure(true)
-                .sameSite("Strict")
-                .path(path)
-                .maxAge(maxAge)
-                .build();
     }
 }
