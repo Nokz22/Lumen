@@ -4,6 +4,14 @@ spring:
   profiles:
     active: dev
 
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    # Endpoints grouped by tag rather than by controller class, so the page reads as
+    # the product does (auth, check-in, instruments, crisis, ...) and not as the package tree.
+    tags-sorter: alpha
+    operations-sorter: method
+
 management:
   endpoints:
     web:

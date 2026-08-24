@@ -40,6 +40,15 @@ public class SecurityConfig {
         "/api/v1/auth/register", "/api/v1/auth/login", "/api/v1/auth/refresh", "/api/v1/auth/logout"
     };
 
+    /**
+     * The contract, not the data: these serve the endpoint shapes every client already
+     * knows from using the app. Deployments that would rather not publish it turn the
+     * whole thing off with springdoc.api-docs.enabled=false instead of guarding it here.
+     */
+    private static final String[] PUBLIC_API_DOCS_ENDPOINTS = {
+        "/v3/api-docs", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**"
+    };
+
     private final String[] allowedOrigins;
 
     public SecurityConfig(@Value("${app.cors.allowed-origins:http://localhost:5173}") String allowedOrigins) {
@@ -76,6 +85,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth.requestMatchers("/actuator/health", "/actuator/info")
                         .permitAll()
                         .requestMatchers(PUBLIC_AUTH_ENDPOINTS)
+                        .permitAll()
+                        .requestMatchers(PUBLIC_API_DOCS_ENDPOINTS)
                         .permitAll()
                         .requestMatchers("/api/v1/admin/**")
                         .hasRole("ADMIN")
