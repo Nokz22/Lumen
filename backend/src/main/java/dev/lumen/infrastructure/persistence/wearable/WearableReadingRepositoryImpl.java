@@ -30,4 +30,9 @@ class WearableReadingRepositoryImpl implements WearableReadingRepository {
     public List<WearableReading> findByUserIdAndRecordedAtBetween(UUID userId, Instant since, Instant until) {
         return jpaRepository.findByUserIdAndRecordedAtBetween(userId, since, until);
     }
+
+    @Override
+    public void deleteByUserId(UUID userId) {
+        jpaRepository.deleteByUserId(userId);
+    }
 }

@@ -11,4 +11,6 @@ public interface WearableReadingRepository {
     List<WearableReading> findByUserIdOrderByRecordedAtDesc(UUID userId);
 
     List<WearableReading> findByUserIdAndRecordedAtBetween(UUID userId, Instant since, Instant until);
+
+    void deleteByUserId(UUID userId);
 }

@@ -24,4 +24,9 @@ class ConversationSummaryRepositoryImpl implements ConversationSummaryRepository
     public Optional<ConversationSummary> findByUserId(UUID userId) {
         return jpaRepository.findByUserId(userId);
     }
+
+    @Override
+    public void deleteByUserId(UUID userId) {
+        jpaRepository.deleteByUserId(userId);
+    }
 }

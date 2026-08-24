@@ -8,4 +8,6 @@ public interface ExerciseCompletionRepository {
     ExerciseCompletion save(ExerciseCompletion completion);
 
     List<ExerciseCompletion> findByUserIdOrderByCompletedAtDesc(UUID userId);
+
+    void deleteByUserId(UUID userId);
 }

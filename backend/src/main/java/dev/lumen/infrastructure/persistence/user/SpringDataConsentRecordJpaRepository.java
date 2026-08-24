@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -16,4 +17,11 @@ interface SpringDataConsentRecordJpaRepository extends JpaRepository<ConsentReco
                     + "ORDER BY c.createdAt DESC")
     List<ConsentRecord> findLatestByUserIdAndConsentType(
             @Param("userId") UUID userId, @Param("consentType") ConsentType consentType, Pageable pageable);
+
+    @Query("SELECT c FROM ConsentRecord c WHERE c.user.id = :userId ORDER BY c.createdAt ASC")
+    List<ConsentRecord> findAllByUserIdOrderByCreatedAtAsc(@Param("userId") UUID userId);
+
+    @Modifying
+    @Query("DELETE FROM ConsentRecord c WHERE c.user.id = :userId")
+    void deleteByUserId(@Param("userId") UUID userId);
 }

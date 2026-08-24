@@ -10,4 +10,6 @@ public interface RefreshTokenRepository {
     void revokeFamily(UUID familyId);
 
     RefreshToken save(RefreshToken refreshToken);
+
+    void deleteByUserId(UUID userId);
 }

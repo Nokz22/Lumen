@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -17,4 +18,8 @@ interface SpringDataMoodCheckInJpaRepository extends JpaRepository<MoodCheckIn, 
 
     @Query("SELECT m FROM MoodCheckIn m WHERE m.user.id = :userId ORDER BY m.checkInDate DESC")
     List<MoodCheckIn> findByUserIdOrderByCheckInDateDesc(@Param("userId") UUID userId);
+
+    @Modifying
+    @Query("DELETE FROM MoodCheckIn m WHERE m.user.id = :userId")
+    void deleteByUserId(@Param("userId") UUID userId);
 }

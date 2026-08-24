@@ -12,4 +12,6 @@ public interface MoodCheckInRepository {
     List<MoodCheckIn> findByUserIdOrderByCheckInDateDesc(UUID userId);
 
     MoodCheckIn save(MoodCheckIn moodCheckIn);
+
+    void deleteByUserId(UUID userId);
 }

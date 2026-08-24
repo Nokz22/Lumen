@@ -13,4 +13,6 @@ public interface UserRepository {
     List<User> findAllOrderedByCreatedAt();
 
     User save(User user);
+
+    void deleteById(UUID id);
 }

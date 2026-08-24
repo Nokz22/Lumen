@@ -8,4 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 interface SpringDataConversationSummaryJpaRepository extends JpaRepository<ConversationSummary, UUID> {
 
     Optional<ConversationSummary> findByUserId(UUID userId);
+
+    void deleteByUserId(UUID userId);
 }

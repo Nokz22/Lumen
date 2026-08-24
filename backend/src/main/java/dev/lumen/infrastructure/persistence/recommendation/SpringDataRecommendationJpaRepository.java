@@ -13,4 +13,6 @@ interface SpringDataRecommendationJpaRepository extends JpaRepository<Recommenda
 
     @Query("SELECT r FROM Recommendation r WHERE r.userId = :userId ORDER BY r.createdAt DESC")
     List<Recommendation> findByUserIdOrderByCreatedAtDesc(@Param("userId") UUID userId);
+
+    void deleteByUserId(UUID userId);
 }

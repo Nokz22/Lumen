@@ -24,4 +24,9 @@ class ConversationMessageRepositoryImpl implements ConversationMessageRepository
     public List<ConversationMessage> findByUserIdOrderByCreatedAtAsc(UUID userId) {
         return jpaRepository.findByUserIdOrderByCreatedAtAsc(userId);
     }
+
+    @Override
+    public void deleteByUserId(UUID userId) {
+        jpaRepository.deleteByUserId(userId);
+    }
 }

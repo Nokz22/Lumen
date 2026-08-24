@@ -43,4 +43,9 @@ class AssessmentRepositoryImpl implements AssessmentRepository {
     public List<Assessment> findByUserIdOrderByCreatedAtDesc(UUID userId) {
         return jpaRepository.findByUserIdOrderByCreatedAtDesc(userId);
     }
+
+    @Override
+    public void deleteByUserId(UUID userId) {
+        jpaRepository.deleteByUserId(userId);
+    }
 }

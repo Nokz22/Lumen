@@ -29,4 +29,9 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
     public List<Recommendation> findByUserIdOrderByCreatedAtDesc(UUID userId) {
         return jpaRepository.findByUserIdOrderByCreatedAtDesc(userId);
     }
+
+    @Override
+    public void deleteByUserId(UUID userId) {
+        jpaRepository.deleteByUserId(userId);
+    }
 }

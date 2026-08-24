@@ -8,4 +8,6 @@ public interface ConversationMessageRepository {
     ConversationMessage save(ConversationMessage message);
 
     List<ConversationMessage> findByUserIdOrderByCreatedAtAsc(UUID userId);
+
+    void deleteByUserId(UUID userId);
 }

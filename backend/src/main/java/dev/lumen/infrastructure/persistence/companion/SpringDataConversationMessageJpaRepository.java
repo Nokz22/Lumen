@@ -11,4 +11,6 @@ interface SpringDataConversationMessageJpaRepository extends JpaRepository<Conve
 
     @Query("SELECT m FROM ConversationMessage m WHERE m.userId = :userId ORDER BY m.createdAt ASC")
     List<ConversationMessage> findByUserIdOrderByCreatedAtAsc(@Param("userId") UUID userId);
+
+    void deleteByUserId(UUID userId);
 }

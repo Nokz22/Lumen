@@ -29,4 +29,14 @@ class ConsentRecordRepositoryImpl implements ConsentRecordRepository {
     public ConsentRecord save(ConsentRecord consentRecord) {
         return jpaRepository.save(consentRecord);
     }
+
+    @Override
+    public List<ConsentRecord> findAllByUserIdOrderByCreatedAtAsc(UUID userId) {
+        return jpaRepository.findAllByUserIdOrderByCreatedAtAsc(userId);
+    }
+
+    @Override
+    public void deleteByUserId(UUID userId) {
+        jpaRepository.deleteByUserId(userId);
+    }
 }

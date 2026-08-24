@@ -11,4 +11,6 @@ interface SpringDataExerciseCompletionJpaRepository extends JpaRepository<Exerci
 
     @Query("SELECT c FROM ExerciseCompletion c WHERE c.userId = :userId ORDER BY c.completedAt DESC")
     List<ExerciseCompletion> findByUserIdOrderByCompletedAtDesc(@Param("userId") UUID userId);
+
+    void deleteByUserId(UUID userId);
 }

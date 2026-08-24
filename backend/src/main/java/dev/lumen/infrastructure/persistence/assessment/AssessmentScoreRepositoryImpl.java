@@ -24,4 +24,9 @@ class AssessmentScoreRepositoryImpl implements AssessmentScoreRepository {
     public Optional<AssessmentScore> findByAssessmentId(UUID assessmentId) {
         return jpaRepository.findByAssessmentId(assessmentId);
     }
+
+    @Override
+    public void deleteByUserId(UUID userId) {
+        jpaRepository.deleteByUserId(userId);
+    }
 }

@@ -36,4 +36,9 @@ class UserRepositoryImpl implements UserRepository {
     public User save(User user) {
         return jpaRepository.save(user);
     }
+
+    @Override
+    public void deleteById(UUID id) {
+        jpaRepository.deleteById(id);
+    }
 }

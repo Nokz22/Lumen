@@ -24,4 +24,9 @@ class ExerciseCompletionRepositoryImpl implements ExerciseCompletionRepository {
     public List<ExerciseCompletion> findByUserIdOrderByCompletedAtDesc(UUID userId) {
         return jpaRepository.findByUserIdOrderByCompletedAtDesc(userId);
     }
+
+    @Override
+    public void deleteByUserId(UUID userId) {
+        jpaRepository.deleteByUserId(userId);
+    }
 }

@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -23,4 +24,8 @@ interface SpringDataAssessmentJpaRepository extends JpaRepository<Assessment, UU
 
     @Query("SELECT a FROM Assessment a WHERE a.user.id = :userId ORDER BY a.createdAt DESC")
     List<Assessment> findByUserIdOrderByCreatedAtDesc(@Param("userId") UUID userId);
+
+    @Modifying
+    @Query("DELETE FROM Assessment a WHERE a.user.id = :userId")
+    void deleteByUserId(@Param("userId") UUID userId);
 }

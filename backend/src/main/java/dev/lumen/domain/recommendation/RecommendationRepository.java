@@ -10,4 +10,6 @@ public interface RecommendationRepository {
     boolean existsByMoodCheckInId(UUID moodCheckInId);
 
     List<Recommendation> findByUserIdOrderByCreatedAtDesc(UUID userId);
+
+    void deleteByUserId(UUID userId);
 }

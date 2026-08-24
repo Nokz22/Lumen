@@ -18,4 +18,6 @@ interface SpringDataWearableReadingJpaRepository extends JpaRepository<WearableR
                     + "ORDER BY r.recordedAt")
     List<WearableReading> findByUserIdAndRecordedAtBetween(
             @Param("userId") UUID userId, @Param("since") Instant since, @Param("until") Instant until);
+
+    void deleteByUserId(UUID userId);
 }

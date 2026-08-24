@@ -31,4 +31,9 @@ class MoodCheckInRepositoryImpl implements MoodCheckInRepository {
     public MoodCheckIn save(MoodCheckIn moodCheckIn) {
         return jpaRepository.save(moodCheckIn);
     }
+
+    @Override
+    public void deleteByUserId(UUID userId) {
+        jpaRepository.deleteByUserId(userId);
+    }
 }

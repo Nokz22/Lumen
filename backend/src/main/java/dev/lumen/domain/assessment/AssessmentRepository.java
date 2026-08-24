@@ -15,4 +15,6 @@ public interface AssessmentRepository {
             UUID userId, AssessmentType assessmentType, Instant since);
 
     List<Assessment> findByUserIdOrderByCreatedAtDesc(UUID userId);
+
+    void deleteByUserId(UUID userId);
 }

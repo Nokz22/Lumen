@@ -8,4 +8,6 @@ public interface ConversationSummaryRepository {
     ConversationSummary save(ConversationSummary summary);
 
     Optional<ConversationSummary> findByUserId(UUID userId);
+
+    void deleteByUserId(UUID userId);
 }
