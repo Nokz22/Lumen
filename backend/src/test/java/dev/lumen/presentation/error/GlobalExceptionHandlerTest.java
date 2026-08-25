@@ -29,6 +29,14 @@ class GlobalExceptionHandlerTest {
         assertThat(problem.getStatus()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
     }
 
+    /** An unmatched URL used to reach the catch-all and come back as a 500. */
+    @Test
+    void shouldMapAnUnknownUrlToNotFoundRatherThanServerError() {
+        ProblemDetail problem = handler.handleNoResourceFound();
+
+        assertThat(problem.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
+
     @Test
     void shouldMapAccessDeniedToForbidden() {
         ProblemDetail problem = handler.handleAccessDenied();

@@ -24,6 +24,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -105,6 +106,16 @@ public class GlobalExceptionHandler {
         }
         problem.setProperty("errors", fieldErrors);
         return problem;
+    }
+
+    /**
+     * A URL that does not exist is a 404, and without this it was not: the catch-all below
+     * turned every unmatched path into a 500 with a stack trace logged at ERROR. A typo in
+     * a client's URL is not a server fault, and an error log full of them hides real ones.
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ProblemDetail handleNoResourceFound() {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, "No such resource");
     }
 
     @ExceptionHandler(Exception.class)
