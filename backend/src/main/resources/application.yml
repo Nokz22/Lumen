@@ -100,3 +100,56 @@ spring:
 app:
   llm:
     provider: mock
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    # DATABASE_JDBC_URL, not DATABASE_URL: Render, Railway and Heroku all inject a
+    # DATABASE_URL of their own in postgres://user:pass@host/db form, which is not a
+    # JDBC URL. Reusing that name means the platform silently supplies a value the
+    # driver cannot parse. The name says which format is expected.
+    url: ${DATABASE_JDBC_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    # Only db/migration. The dev-seed location plants a demo account with a known
+    # password, and inheriting the dev list here would put it in production.
+    locations: classpath:db/migration
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        # No /actuator/info in production: it is unauthenticated (SecurityConfig) and
+        # exists to describe the build, which is free reconnaissance for no benefit.
+        include: health
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
+
+app:
+  # Every one of these is deliberately written without a fallback. An unresolvable
+  # placeholder stops the application from starting, which is the only acceptable
+  # failure mode: a production instance that boots with the dev secret committed in
+  # this repository is one that anyone reading the repository can forge tokens for.
+  jwt:
+    secret: ${JWT_SECRET}
+  encryption:
+    key: ${ENCRYPTION_KEY}
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS}

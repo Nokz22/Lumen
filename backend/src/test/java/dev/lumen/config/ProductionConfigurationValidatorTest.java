@@ -1,0 +1,94 @@
+package dev.lumen.config;
+
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.mock.env.MockEnvironment;
+
+class ProductionConfigurationValidatorTest {
+
+    private static final String COMMITTED_JWT_SECRET =
+            "dev-only-insecure-secret-change-me-0123456789abcdefghijklmnop";
+    private static final String COMMITTED_ENCRYPTION_KEY = "zxLVCSUFSFXj60TnIb6R7L+4Y0jAPDe62VKLIvTkjqI=";
+
+    private final ProductionConfigurationValidator validator = new ProductionConfigurationValidator();
+
+    private MockEnvironment environmentWith(String... profiles) {
+        MockEnvironment environment = new MockEnvironment();
+        environment.setActiveProfiles(profiles);
+        return environment;
+    }
+
+    private void withCompleteConfiguration(MockEnvironment environment) {
+        environment.setProperty("DATABASE_JDBC_URL", "jdbc:postgresql://db:5432/lumen");
+        environment.setProperty("DATABASE_USERNAME", "lumen");
+        environment.setProperty("DATABASE_PASSWORD", "a-real-password");
+        environment.setProperty("RABBITMQ_HOST", "broker");
+        environment.setProperty("RABBITMQ_USERNAME", "lumen");
+        environment.setProperty("RABBITMQ_PASSWORD", "a-real-password");
+        environment.setProperty("JWT_SECRET", "a-real-deployment-secret-not-in-git-0123456789abcdef");
+        environment.setProperty("ENCRYPTION_KEY", "Zm9yLXRlc3Rpbmctb25seS1ub3QtYS1yZWFsLWtleS0wMDAwMDA=");
+        environment.setProperty("CORS_ALLOWED_ORIGINS", "https://lumen.example");
+    }
+
+    @Test
+    void shouldStayOutOfTheWayWhenTheProductionProfileIsNotActive() {
+        assertThatCode(() -> validator.postProcessEnvironment(environmentWith("dev"), null))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    void shouldStartWhenEveryProductionValueIsSupplied() {
+        MockEnvironment environment = environmentWith("prod");
+        withCompleteConfiguration(environment);
+
+        assertThatCode(() -> validator.postProcessEnvironment(environment, null))
+                .doesNotThrowAnyException();
+    }
+
+    /** One startup failure naming everything that is missing beats nine deploys in a row. */
+    @Test
+    void shouldNameEveryMissingVariableInASingleFailure() {
+        assertThatThrownBy(() -> validator.postProcessEnvironment(environmentWith("prod"), null))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("DATABASE_JDBC_URL is not set")
+                .hasMessageContaining("JWT_SECRET is not set")
+                .hasMessageContaining("ENCRYPTION_KEY is not set")
+                .hasMessageContaining("CORS_ALLOWED_ORIGINS is not set");
+    }
+
+    @Test
+    void shouldRefuseTheJwtSecretThatIsCommittedInThisRepository() {
+        MockEnvironment environment = environmentWith("prod");
+        withCompleteConfiguration(environment);
+        environment.setProperty("JWT_SECRET", COMMITTED_JWT_SECRET);
+
+        assertThatThrownBy(() -> validator.postProcessEnvironment(environment, null))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("JWT_SECRET is set to the development value");
+    }
+
+    @Test
+    void shouldRefuseTheEncryptionKeyThatIsCommittedInThisRepository() {
+        MockEnvironment environment = environmentWith("prod");
+        withCompleteConfiguration(environment);
+        environment.setProperty("ENCRYPTION_KEY", COMMITTED_ENCRYPTION_KEY);
+
+        assertThatThrownBy(() -> validator.postProcessEnvironment(environment, null))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("ENCRYPTION_KEY is set to the development value");
+    }
+
+    /** Blank is the shape a forgotten value takes in a deployment UI, not absent. */
+    @Test
+    void shouldTreatABlankValueAsMissing() {
+        MockEnvironment environment = environmentWith("prod");
+        withCompleteConfiguration(environment);
+        environment.setProperty("DATABASE_PASSWORD", "   ");
+
+        assertThatThrownBy(() -> validator.postProcessEnvironment(environment, null))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("DATABASE_PASSWORD is not set");
+    }
+}
