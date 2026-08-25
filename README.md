@@ -74,6 +74,7 @@ Ethically, wellbeing software is a domain where a shortcut in engineering can be
 | Wearable ingestion (simulated provider) | ✅ Implemented |
 | AI companion with three-layer guardrails | ✅ Implemented |
 | Real wearable adapters (Fitbit / Garmin / Apple Health) | 📋 Planned |
+| Production images, `prod` profile & compose topology | ✅ Implemented |
 | Rate limiting on public endpoints | 📋 Planned |
 | Observability (Micrometer / Prometheus) | 📋 Planned |
 | Production deployment & hardening | ⏳ In Progress (Phase 7) |
@@ -349,9 +350,53 @@ Register an account at `/register`, or use the seeded **demo account** (`dev` pr
 
 ---
 
+## Running in Production
+
+The development setup above starts only the dependencies. `docker-compose.prod.yml` builds
+and runs the whole stack — both apps as multi-stage images, neither carrying its build
+toolchain into the published layer, both running unprivileged.
+
+```bash
+cp .env.example .env      # then fill in the PRODUCTION block
+
+docker compose -f docker-compose.prod.yml up --build
+```
+
+**The `prod` profile refuses to start when it is misconfigured, on purpose.** Every secret
+is declared without a fallback, and a validator runs before the first bean is created,
+reporting every missing variable at once by name rather than surfacing later as a driver
+error that names nothing.
+
+It also rejects the two development secrets committed in `application.yml`. Those values
+are in this repository's history permanently, so a deployment using them signs tokens
+anybody can forge and encrypts emotional content to a key anybody can read. Generate your
+own:
+
+```bash
+openssl rand -base64 48   # JWT_SECRET
+openssl rand -base64 32   # ENCRYPTION_KEY (AES-256 — must decode to 32 bytes)
+```
+
+Two details worth knowing before the first deploy:
+
+- **`DATABASE_JDBC_URL`, not `DATABASE_URL`.** Render, Railway and Heroku inject a
+  `DATABASE_URL` of their own in `postgres://user:pass@host/db` form, which is not a JDBC
+  URL. Reusing that name would let the platform silently supply a value the driver cannot
+  parse.
+- **`VITE_API_BASE_URL` is a build argument.** Vite inlines it into the bundle, so pointing
+  the frontend at a different backend means rebuilding its image, not restarting it.
+
+What the `prod` profile changes beyond credentials: Flyway runs only `db/migration`, never
+the dev seed that plants a demo account with a published password; `/actuator/info` is not
+exposed; health details are hidden; and liveness and readiness probes are enabled for the
+platform to poll.
+
+---
+
 ## Environment Variables
 
-Configuration examples are available in `.env.example`.
+Every variable is documented in `.env.example`, split into a development block and a
+production block.
 
 Never commit real secrets.
 
