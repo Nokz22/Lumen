@@ -82,7 +82,10 @@ public class SecurityConfig {
                                 new StatelessSecurityContextRepository()))
                 .exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(
                         (request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED)))
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/actuator/health", "/actuator/info")
+                // health/** and not just health: the liveness and readiness probes live
+                // underneath it, and a platform that cannot reach them unauthenticated
+                // decides the container is unhealthy and restarts it forever.
+                .authorizeHttpRequests(auth -> auth.requestMatchers("/actuator/health/**", "/actuator/info")
                         .permitAll()
                         .requestMatchers(PUBLIC_AUTH_ENDPOINTS)
                         .permitAll()
