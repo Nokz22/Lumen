@@ -7,6 +7,8 @@ import dev.lumen.domain.companion.ConversationMessage;
 import dev.lumen.domain.companion.ConversationMessageRepository;
 import dev.lumen.domain.companion.ConversationRole;
 import dev.lumen.domain.crisis.TriggerSource;
+import dev.lumen.domain.observability.GuardrailLayer;
+import dev.lumen.domain.observability.SafetyMetrics;
 import dev.lumen.domain.user.ConsentRequiredException;
 import dev.lumen.domain.user.ConsentType;
 import dev.lumen.domain.user.User;
@@ -38,6 +40,7 @@ public class ConversationService {
     private final ChatRiskClassifier chatRiskClassifier;
     private final RiskEventTriggerService riskEventTriggerService;
     private final CompanionResponseService companionResponseService;
+    private final SafetyMetrics safetyMetrics;
 
     public ConversationService(
             ConversationMessageRepository conversationMessageRepository,
@@ -45,13 +48,15 @@ public class ConversationService {
             ConsentService consentService,
             ChatRiskClassifier chatRiskClassifier,
             RiskEventTriggerService riskEventTriggerService,
-            CompanionResponseService companionResponseService) {
+            CompanionResponseService companionResponseService,
+            SafetyMetrics safetyMetrics) {
         this.conversationMessageRepository = conversationMessageRepository;
         this.userRepository = userRepository;
         this.consentService = consentService;
         this.chatRiskClassifier = chatRiskClassifier;
         this.riskEventTriggerService = riskEventTriggerService;
         this.companionResponseService = companionResponseService;
+        this.safetyMetrics = safetyMetrics;
     }
 
     @Transactional
@@ -63,6 +68,7 @@ public class ConversationService {
                 conversationMessageRepository.save(new ConversationMessage(userId, ConversationRole.USER, content));
 
         if (chatRiskClassifier.isHighRisk(content)) {
+            safetyMetrics.guardrailBlocked(GuardrailLayer.INPUT_CLASSIFIER);
             CrisisTriggerOutcome outcome =
                     riskEventTriggerService.trigger(userId, null, TriggerSource.CHAT_MESSAGE, user.getRegion());
             return new ConversationCrisisResult(outcome.riskEventId(), outcome.resources());
