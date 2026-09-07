@@ -18,9 +18,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -116,6 +119,31 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NoResourceFoundException.class)
     public ProblemDetail handleNoResourceFound() {
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, "No such resource");
+    }
+
+    /**
+     * The same failure as the one above wearing a different name: a request Spring MVC
+     * could not dispatch is a client mistake, and both of these were reaching the
+     * catch-all and coming back as 500s.
+     */
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ProblemDetail handleMethodNotSupported() {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.METHOD_NOT_ALLOWED, "Method not allowed for this resource");
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ProblemDetail handleUnsupportedMediaType() {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Unsupported content type");
+    }
+
+    /**
+     * A body Jackson cannot read is a malformed request, not a broken server. The detail is
+     * deliberately generic: the parser's own message quotes the offending input back, and
+     * the offending input here is a person's questionnaire answers or chat message.
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ProblemDetail handleUnreadableBody() {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Malformed request body");
     }
 
     @ExceptionHandler(Exception.class)
