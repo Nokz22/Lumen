@@ -75,8 +75,8 @@ Ethically, wellbeing software is a domain where a shortcut in engineering can be
 | AI companion with three-layer guardrails | ✅ Implemented |
 | Real wearable adapters (Fitbit / Garmin / Apple Health) | 📋 Planned |
 | Production images, `prod` profile & compose topology | ✅ Implemented |
-| Rate limiting on public endpoints | 📋 Planned |
-| Observability (Micrometer / Prometheus) | 📋 Planned |
+| Rate limiting on public and LLM endpoints | ✅ Implemented |
+| Observability (Micrometer / Prometheus) | ✅ Implemented |
 | Production deployment & hardening | ⏳ In Progress (Phase 7) |
 
 ---
@@ -183,6 +183,7 @@ The reasoning behind every non-obvious choice is written down as it's made, not 
 | [0009](docs/adr/0009-conversation-memory-window-plus-summary.md) | Conversation memory as a fixed window + rolling summary, never full history replay |
 | [0010](docs/adr/0010-llm-guardrails-three-layer-defense.md) | Three-layer LLM defense — safety is never delegated to the model itself |
 | [0011](docs/adr/0011-data-subject-rights-export-and-erasure.md) | Data-subject rights — export is not gated on consent, erasure is real deletion |
+| [0012](docs/adr/0012-metrics-and-rate-limiting.md) | Metrics and rate limiting — and the crisis flow that is never rate limited |
 
 Full list, including infrastructure-level decisions (Flyway, MapStruct): **[docs/adr/](docs/adr/)**.
 
@@ -385,6 +386,35 @@ Two details worth knowing before the first deploy:
   parse.
 - **`VITE_API_BASE_URL` is a build argument.** Vite inlines it into the bundle, so pointing
   the frontend at a different backend means rebuilding its image, not restarting it.
+
+## Observability and Rate Limiting
+
+`/actuator/prometheus` exposes the usual JVM, connection-pool, HTTP and Resilience4j series,
+plus three counters this project adds because no library can know what it is for:
+
+| Metric | Answers |
+|---|---|
+| `lumen_risk_event_triggered_total{source}` | Is the crisis path alive, and what is detecting risk? |
+| `lumen_companion_guardrail_blocked_total{layer}` | Are the guardrails actually stopping anything? |
+| `lumen_companion_fallback_served_total` | How often is the language model failing people? |
+
+Every series is registered at zero on startup — a counter that only appears when first
+incremented is indistinguishable from a broken exporter. No metric carries a user id and
+every label comes from an enum: what is measured is that a safety path fired, never whose.
+
+`/actuator/health` stays public because the platform must reach it, probes included.
+`/actuator/prometheus` requires ADMIN: health says up or down, while metrics describe when
+the crisis flow is firing, which in this domain is a picture of when people are in trouble.
+
+Rate limiting covers the two endpoints that need it — authentication (10/min per client
+address) and companion messages (30/hour per user). **The crisis flow is never rate limited,
+at any rate, for any caller.** Someone retrying because a page did not load is the last
+person who should meet a 429. See **[ADR-0012](docs/adr/0012-metrics-and-rate-limiting.md)**.
+
+Buckets are in-memory, so a second instance would allow the full quota again — a known
+boundary, documented rather than discovered.
+
+---
 
 What the `prod` profile changes beyond credentials: Flyway runs only `db/migration`, never
 the dev seed that plants a demo account with a published password; `/actuator/info` is not
