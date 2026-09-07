@@ -16,10 +16,13 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,prometheus
   endpoint:
     health:
       show-details: when-authorized
+  metrics:
+    tags:
+      application: lumen
 
 app:
   # Dev-only defaults below — production (Fase 7) MUST override via real environment
@@ -135,12 +138,21 @@ management:
       exposure:
         # No /actuator/info in production: it is unauthenticated (SecurityConfig) and
         # exists to describe the build, which is free reconnaissance for no benefit.
-        include: health
+        # /actuator/prometheus is exposed but requires authentication — it is the one
+        # actuator endpoint that describes real traffic.
+        include: health,prometheus
   endpoint:
     health:
       show-details: never
       probes:
         enabled: true
+
+# Behind the platform's proxy the socket address is the proxy's, so every caller would
+# share one rate-limit bucket. This makes Spring apply the forwarded headers the proxy
+# sets, which is why the rate limiter reads getRemoteAddr() instead of trusting an
+# X-Forwarded-For header itself — a header a client can set is a key a client can choose.
+server:
+  forward-headers-strategy: framework
 
 app:
   # Every one of these is deliberately written without a fallback. An unresolvable

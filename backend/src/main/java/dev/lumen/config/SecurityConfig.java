@@ -1,9 +1,12 @@
 package dev.lumen.config;
 
 import dev.lumen.application.auth.TokenService;
+import dev.lumen.infrastructure.ratelimit.RateLimitFilter;
+import dev.lumen.infrastructure.ratelimit.RateLimiter;
 import dev.lumen.infrastructure.security.CsrfCookieFilter;
 import dev.lumen.infrastructure.security.JwtAuthenticationFilter;
 import dev.lumen.infrastructure.security.StatelessSecurityContextRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,6 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -61,7 +65,9 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, TokenService tokenService) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http, TokenService tokenService, RateLimiter rateLimiter, ObjectMapper objectMapper)
+            throws Exception {
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         // The default XorCsrfTokenRequestAttributeHandler expects the
@@ -82,23 +88,41 @@ public class SecurityConfig {
                                 new StatelessSecurityContextRepository()))
                 .exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(
                         (request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED)))
-                // health/** and not just health: the liveness and readiness probes live
-                // underneath it, and a platform that cannot reach them unauthenticated
-                // decides the container is unhealthy and restarts it forever.
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/actuator/health/**", "/actuator/info")
-                        .permitAll()
-                        .requestMatchers(PUBLIC_AUTH_ENDPOINTS)
-                        .permitAll()
-                        .requestMatchers(PUBLIC_API_DOCS_ENDPOINTS)
-                        .permitAll()
-                        .requestMatchers("/api/v1/admin/**")
-                        .hasRole("ADMIN")
-                        .anyRequest()
-                        .authenticated())
+                .authorizeHttpRequests(SecurityConfig::authorizeRequests)
                 .addFilterBefore(new JwtAuthenticationFilter(tokenService), UsernamePasswordAuthenticationFilter.class)
+                // After authentication so the companion limit can key on the user, before
+                // authorization so a rejected caller is turned away without the request
+                // ever reaching a controller.
+                .addFilterAfter(new RateLimitFilter(rateLimiter, objectMapper), JwtAuthenticationFilter.class)
                 .addFilterAfter(new CsrfCookieFilter(), CsrfFilter.class);
 
         return http.build();
+    }
+
+    /**
+     * health/** and not just health: the liveness and readiness probes live underneath it,
+     * and a platform that cannot reach them unauthenticated decides the container is
+     * unhealthy and restarts it forever.
+     */
+    private static void authorizeRequests(
+            AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auth) {
+        auth.requestMatchers("/actuator/health/**", "/actuator/info")
+                .permitAll()
+                // Everything else under /actuator, /actuator/prometheus above all, stays
+                // behind ADMIN. Health says up or down; the metrics endpoint describes how
+                // much traffic there is, how often the crisis path fires and when the
+                // language model is failing — an operational picture, and in this domain
+                // a picture of when people are in trouble.
+                .requestMatchers("/actuator/**")
+                .hasRole("ADMIN")
+                .requestMatchers(PUBLIC_AUTH_ENDPOINTS)
+                .permitAll()
+                .requestMatchers(PUBLIC_API_DOCS_ENDPOINTS)
+                .permitAll()
+                .requestMatchers("/api/v1/admin/**")
+                .hasRole("ADMIN")
+                .anyRequest()
+                .authenticated();
     }
 
     private CorsConfigurationSource corsConfigurationSource() {
