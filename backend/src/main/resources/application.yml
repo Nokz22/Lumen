@@ -105,6 +105,33 @@ app:
     provider: mock
 
 ---
+# A demo instance: a real deployment whose only difference from production is that every
+# person in it is invented. Same schema, same encryption, same guardrails — DemoDataSeeder
+# fills it with eight weeks of synthetic history so the app can be understood on sight.
+spring:
+  config:
+    activate:
+      on-profile: demo
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:lumen}
+    username: ${POSTGRES_USER:lumen}
+    password: ${POSTGRES_PASSWORD:changeme}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    # Not db/dev-seed: that plants the demo account as a bare row, and the seeder builds
+    # the whole account itself so the free-text fields go through the encrypting converter.
+    locations: classpath:db/migration
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_DEFAULT_USER:lumen}
+    password: ${RABBITMQ_DEFAULT_PASS:changeme}
+
+---
 spring:
   config:
     activate:
