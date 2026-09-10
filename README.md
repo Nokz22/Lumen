@@ -72,6 +72,7 @@ Ethically, wellbeing software is a domain where a shortcut in engineering can be
 | PHQ-9 / GAD-7 instruments & crisis flow | ✅ Implemented |
 | Rule-based recommendation engine | ✅ Implemented |
 | Wearable ingestion (simulated provider) | ✅ Implemented |
+| Demo profile with eight weeks of synthetic history | ✅ Implemented |
 | AI companion with three-layer guardrails | ✅ Implemented |
 | Real wearable adapters (Fitbit / Garmin / Apple Health) | 📋 Planned |
 | Production images, `prod` profile & compose topology | ✅ Implemented |
@@ -348,6 +349,34 @@ npm run dev
 ```
 
 Register an account at `/register`, or use the seeded **demo account** (`dev` profile): `demo@lumen.dev` / `Demo1234!` — health-data consent is already granted, so you can check in immediately after logging in.
+
+---
+
+## Running the Demo
+
+The `demo` profile fills a fresh database with eight weeks of coherent synthetic history —
+check-ins, wearable readings, engine-generated recommendations and two completed
+instruments — so the product can be understood on sight rather than after a fortnight of
+use.
+
+```bash
+docker compose up -d
+
+cd backend && ./gradlew bootRun --args='--spring.profiles.active=demo'
+```
+
+Log in with `demo@lumen.dev` / `Demo1234!`. The data tells one story: a rough few weeks
+that gradually improves, which is what makes the correlation panel say something true —
+nights of shorter sleep really are followed by lower-energy days in this data, because
+both are generated from the same underlying trend.
+
+**No crisis scenario is ever seeded.** PHQ-9 item 9 is fixed at zero and a demo database
+contains no `RiskEvent`, enforced by a test. A public instance carrying one would read
+exactly like a real person having been in danger; the crisis flow is demonstrated
+deliberately, in a controlled setting, by answering item 9 by hand.
+
+Everyone in a demo instance is invented. The profile exists so that fabricated health
+history can never reach a production database.
 
 ---
 
