@@ -29,7 +29,8 @@
     "loading": "Loading your history…",
     "loggedFeeling": "You logged feeling {{emotion}}",
     "energy": "Energy {{level}}/5",
-    "sleep": "{{hours}}h of sleep, quality {{quality}}/5"
+    "sleep": "{{hours}}h of sleep, quality {{quality}}/5",
+    "showingRecent": "Showing your last {{shown}} check-ins of {{total}}."
   },
   "language": {
     "en": "EN",
@@ -166,7 +167,8 @@
       "title": "Suggested for you",
       "loading": "Loading your suggestions…",
       "empty": "No suggestions yet — they'll show up here after a check-in.",
-      "error": "Couldn't load your suggestions. Please try again."
+      "error": "Couldn't load your suggestions. Please try again.",
+      "showingRecent": "Showing the {{shown}} most recent of {{total}} suggestions."
     }
   },
   "wearable": {

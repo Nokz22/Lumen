@@ -5,6 +5,9 @@ import { useRecommendationHistory, usePrependRecommendation } from './useRecomme
 import { useRecommendationSocket } from './useRecommendationSocket'
 import type { RecommendationSummary } from '../../types/recommendation'
 
+/** Same reasoning as MoodHistory: suggestions accumulate, the screen should not. */
+const VISIBLE_RECOMMENDATIONS = 5
+
 export function RecommendationFeed() {
   const { t } = useTranslation()
   const { user } = useAuth()
@@ -41,7 +44,7 @@ export function RecommendationFeed() {
 
       {data && data.length > 0 && (
         <ul role="list" className="flex flex-col gap-3">
-          {data.map((recommendation) => (
+          {data.slice(0, VISIBLE_RECOMMENDATIONS).map((recommendation) => (
             <li
               key={recommendation.id}
               className="flex flex-col gap-1 rounded-xl border border-[var(--color-border)] px-4 py-3 text-sm"
@@ -64,6 +67,15 @@ export function RecommendationFeed() {
             </li>
           ))}
         </ul>
+      )}
+
+      {data && data.length > VISIBLE_RECOMMENDATIONS && (
+        <p className="text-sm text-[var(--color-text-muted)]">
+          {t('recommendation.feed.showingRecent', {
+            shown: VISIBLE_RECOMMENDATIONS,
+            total: data.length,
+          })}
+        </p>
       )}
     </section>
   )

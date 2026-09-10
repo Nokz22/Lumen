@@ -29,7 +29,8 @@
     "loading": "A carregar o teu histórico…",
     "loggedFeeling": "Registaste sentir-te {{emotion}}",
     "energy": "Energia {{level}}/5",
-    "sleep": "{{hours}}h de sono, qualidade {{quality}}/5"
+    "sleep": "{{hours}}h de sono, qualidade {{quality}}/5",
+    "showingRecent": "A mostrar os teus últimos {{shown}} check-ins de {{total}}."
   },
   "language": {
     "en": "EN",
@@ -166,7 +167,8 @@
       "title": "Sugerido para ti",
       "loading": "A carregar as tuas sugestões…",
       "empty": "Ainda não há sugestões — vão aparecer aqui depois de um check-in.",
-      "error": "Não foi possível carregar as tuas sugestões. Tenta novamente."
+      "error": "Não foi possível carregar as tuas sugestões. Tenta novamente.",
+      "showingRecent": "A mostrar as {{shown}} sugestões mais recentes de {{total}}."
     }
   },
   "wearable": {
