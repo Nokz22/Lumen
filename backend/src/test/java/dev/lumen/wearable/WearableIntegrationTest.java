@@ -1,5 +1,6 @@
 package dev.lumen.wearable;
 
+import static dev.lumen.support.TestClients.distinctClient;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -11,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.lumen.domain.moodcheckin.MoodCheckIn;
 import dev.lumen.domain.moodcheckin.MoodCheckInRepository;
 import dev.lumen.domain.moodcheckin.MoodEmotion;
+import dev.lumen.domain.shared.PageQuery;
 import dev.lumen.domain.user.User;
 import dev.lumen.domain.user.UserRepository;
 import dev.lumen.presentation.auth.dto.RegisterRequest;
@@ -28,6 +30,7 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -65,6 +68,9 @@ class WearableIntegrationTest {
     @Autowired
     private UserRepository userRepository;
 
+    /** Each test signs in as its own client, so they do not share one rate-limit budget. */
+    private final RequestPostProcessor client = distinctClient();
+
     private record AuthenticatedUser(UUID userId, Cookie accessTokenCookie) {
     }
 
@@ -79,6 +85,7 @@ class WearableIntegrationTest {
 
         MvcResult result = mockMvc.perform(post("/api/v1/auth/register")
                         .with(csrf())
+                        .with(client)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isCreated())
@@ -109,7 +116,10 @@ class WearableIntegrationTest {
                 .andExpect(status().isOk())
                 .andReturn();
         JsonNode history = objectMapper.readTree(historyResult.getResponse().getContentAsString());
-        assertThat(history.size()).isEqualTo(simulated.size());
+        // Fourteen days of readings do not arrive in one response any more: the page reports
+        // the full count and hands back the first PageQuery.DEFAULT_SIZE of them.
+        assertThat(history.get("totalElements").asInt()).isEqualTo(simulated.size());
+        assertThat(history.get("content")).hasSize(PageQuery.DEFAULT_SIZE);
     }
 
     @Test
