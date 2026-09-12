@@ -1,5 +1,6 @@
 package dev.lumen.privacy;
 
+import static dev.lumen.support.TestClients.distinctClient;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
@@ -31,6 +32,7 @@ import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -58,6 +60,9 @@ class PrivacyIntegrationTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    /** Each test signs in as its own client, so they do not share one rate-limit budget. */
+    private final RequestPostProcessor client = distinctClient();
+
     private record AuthenticatedUser(UUID userId, Cookie accessTokenCookie) {
     }
 
@@ -72,6 +77,7 @@ class PrivacyIntegrationTest {
 
         MvcResult result = mockMvc.perform(post("/api/v1/auth/register")
                         .with(csrf())
+                        .with(client)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isCreated())

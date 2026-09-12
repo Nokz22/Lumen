@@ -1,5 +1,6 @@
 package dev.lumen.recommendation;
 
+import static dev.lumen.support.TestClients.distinctClient;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -29,6 +30,7 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -68,6 +70,9 @@ class RecommendationMessagingIntegrationTest {
     @Autowired
     private RecommendationRepository recommendationRepository;
 
+    /** Each test signs in as its own client, so they do not share one rate-limit budget. */
+    private final RequestPostProcessor client = distinctClient();
+
     private record AuthenticatedUser(UUID userId, Cookie accessTokenCookie) {
     }
 
@@ -82,6 +87,7 @@ class RecommendationMessagingIntegrationTest {
 
         MvcResult result = mockMvc.perform(post("/api/v1/auth/register")
                         .with(csrf())
+                        .with(client)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isCreated())

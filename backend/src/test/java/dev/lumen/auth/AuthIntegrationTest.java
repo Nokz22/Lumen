@@ -1,5 +1,6 @@
 package dev.lumen.auth;
 
+import static dev.lumen.support.TestClients.distinctClient;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -26,6 +27,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -56,6 +58,13 @@ class AuthIntegrationTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    /**
+     * This class makes eighteen calls to /api/v1/auth in about two seconds. From one
+     * address that is over the ten-a-minute limit, and the limiter was right to refuse the
+     * later ones; they are separate people signing in, so they get separate addresses.
+     */
+    private final RequestPostProcessor client = distinctClient();
+
     private RegisterRequest newRegisterRequest() {
         return new RegisterRequest(
                 "test-" + UUID.randomUUID() + "@lumen.dev",
@@ -70,6 +79,7 @@ class AuthIntegrationTest {
     void shouldRegisterAndSetAuthCookies() throws Exception {
         mockMvc.perform(post("/api/v1/auth/register")
                         .with(csrf())
+                        .with(client)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newRegisterRequest())))
                 .andExpect(status().isCreated())
@@ -85,12 +95,14 @@ class AuthIntegrationTest {
         RegisterRequest request = newRegisterRequest();
         mockMvc.perform(post("/api/v1/auth/register")
                         .with(csrf())
+                        .with(client)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated());
 
         mockMvc.perform(post("/api/v1/auth/register")
                         .with(csrf())
+                        .with(client)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isConflict());
@@ -108,6 +120,7 @@ class AuthIntegrationTest {
 
         mockMvc.perform(post("/api/v1/auth/register")
                         .with(csrf())
+                        .with(client)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(underage)))
                 .andExpect(status().isBadRequest());
@@ -118,12 +131,14 @@ class AuthIntegrationTest {
         RegisterRequest registerRequest = newRegisterRequest();
         mockMvc.perform(post("/api/v1/auth/register")
                         .with(csrf())
+                        .with(client)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isCreated());
 
         mockMvc.perform(post("/api/v1/auth/login")
                         .with(csrf())
+                        .with(client)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
                                 new LoginRequest(registerRequest.email(), "WrongPassword1"))))
@@ -135,6 +150,7 @@ class AuthIntegrationTest {
         RegisterRequest registerRequest = newRegisterRequest();
         MvcResult registerResult = mockMvc.perform(post("/api/v1/auth/register")
                         .with(csrf())
+                        .with(client)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isCreated())
@@ -143,6 +159,7 @@ class AuthIntegrationTest {
 
         MvcResult refreshResult = mockMvc.perform(post("/api/v1/auth/refresh")
                         .with(csrf())
+                        .with(client)
                         .cookie(originalRefreshToken))
                 .andExpect(status().isNoContent())
                 .andReturn();
@@ -152,6 +169,7 @@ class AuthIntegrationTest {
         // A second refresh with the rotated token succeeds (normal usage).
         mockMvc.perform(post("/api/v1/auth/refresh")
                         .with(csrf())
+                        .with(client)
                         .cookie(rotatedRefreshToken))
                 .andExpect(status().isNoContent());
 
@@ -159,10 +177,12 @@ class AuthIntegrationTest {
         // family is revoked, so even the most recently rotated token stops working.
         mockMvc.perform(post("/api/v1/auth/refresh")
                         .with(csrf())
+                        .with(client)
                         .cookie(originalRefreshToken))
                 .andExpect(status().isUnauthorized());
         mockMvc.perform(post("/api/v1/auth/refresh")
                         .with(csrf())
+                        .with(client)
                         .cookie(rotatedRefreshToken))
                 .andExpect(status().isUnauthorized());
     }
@@ -172,6 +192,7 @@ class AuthIntegrationTest {
         RegisterRequest registerRequest = newRegisterRequest();
         MvcResult registerResult = mockMvc.perform(post("/api/v1/auth/register")
                         .with(csrf())
+                        .with(client)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isCreated())
@@ -181,11 +202,13 @@ class AuthIntegrationTest {
 
         mockMvc.perform(post("/api/v1/auth/logout")
                         .with(csrf())
+                        .with(client)
                         .cookie(accessToken)
                         .cookie(refreshToken))
                 .andExpect(status().isNoContent());
 
-        mockMvc.perform(post("/api/v1/auth/refresh").with(csrf()).cookie(refreshToken))
+        mockMvc.perform(post("/api/v1/auth/refresh").with(csrf())
+                        .with(client).cookie(refreshToken))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -194,20 +217,21 @@ class AuthIntegrationTest {
         RegisterRequest registerRequest = newRegisterRequest();
         MvcResult registerResult = mockMvc.perform(post("/api/v1/auth/register")
                         .with(csrf())
+                        .with(client)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isCreated())
                 .andReturn();
         Cookie accessToken = registerResult.getResponse().getCookie("access_token");
 
-        mockMvc.perform(get("/api/v1/auth/me").cookie(accessToken))
+        mockMvc.perform(get("/api/v1/auth/me").with(client).cookie(accessToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value(registerRequest.email()));
     }
 
     @Test
     void shouldRejectMeEndpointWithoutAuthentication() throws Exception {
-        mockMvc.perform(get("/api/v1/auth/me")).andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/api/v1/auth/me").with(client)).andExpect(status().isUnauthorized());
     }
 
     private Cookie loginAsAdminFixture() throws Exception {
@@ -224,6 +248,7 @@ class AuthIntegrationTest {
 
         MvcResult loginResult = mockMvc.perform(post("/api/v1/auth/login")
                         .with(csrf())
+                        .with(client)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new LoginRequest(email, rawPassword))))
                 .andExpect(status().isOk())
@@ -243,6 +268,7 @@ class AuthIntegrationTest {
         RegisterRequest registerRequest = newRegisterRequest();
         MvcResult registerResult = mockMvc.perform(post("/api/v1/auth/register")
                         .with(csrf())
+                        .with(client)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isCreated())
@@ -258,6 +284,7 @@ class AuthIntegrationTest {
         RegisterRequest registerRequest = newRegisterRequest();
         MvcResult registerResult = mockMvc.perform(post("/api/v1/auth/register")
                         .with(csrf())
+                        .with(client)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isCreated())
