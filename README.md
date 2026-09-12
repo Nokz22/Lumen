@@ -302,7 +302,7 @@ Full diagram set, including the Context-level view and domain models: **[docs/di
 | Line coverage (JaCoCo) | 87.9% |
 | Quality gate | Checkstyle (zero warnings) + JaCoCo (≥80% line, enforced in CI) |
 | Java version | 17 (Temurin) |
-| Node version | 20 |
+| Node version | 22 |
 | Containers | 2 (PostgreSQL 16, RabbitMQ 3) via Docker Compose |
 | Frontend tests | 30 (Vitest + React Testing Library) |
 | CI pipeline | GitHub Actions — 3 jobs (backend, frontend, secret scanning) |
