@@ -47,6 +47,24 @@ jobs:
       - name: Build, test and check
         run: ./gradlew build
 
+      - name: Summarise test failures
+        if: failure()
+        run: |
+          python3 - <<'PY'
+          import glob
+          import xml.etree.ElementTree as ET
+
+          for path in sorted(glob.glob('build/test-results/test/*.xml')):
+              for case in ET.parse(path).getroot().iter('testcase'):
+                  for kind in ('failure', 'error'):
+                      node = case.find(kind)
+                      if node is None:
+                          continue
+                      print(f"{case.get('classname')} > {case.get('name')} [{kind}]")
+                      print((node.get('message') or '').strip()[:600])
+                      print('-' * 72)
+          PY
+
   frontend:
     name: Frontend (lint, build)
     runs-on: ubuntu-latest
