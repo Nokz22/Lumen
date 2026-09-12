@@ -4,7 +4,8 @@ import dev.lumen.domain.exercise.ExerciseCompletion;
 import dev.lumen.domain.exercise.ExerciseCompletionRepository;
 import dev.lumen.domain.exercise.ExerciseNotFoundException;
 import dev.lumen.domain.exercise.ExerciseRepository;
-import java.util.List;
+import dev.lumen.domain.shared.PageQuery;
+import dev.lumen.domain.shared.PagedResult;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,10 +37,10 @@ public class ExerciseCompletionService {
     }
 
     @Transactional(readOnly = true)
-    public List<ExerciseCompletionResponse> getHistory(UUID userId) {
-        return completionRepository.findByUserIdOrderByCompletedAtDesc(userId).stream()
-                .map(this::toResponse)
-                .toList();
+    public PagedResult<ExerciseCompletionResponse> getHistory(UUID userId, PageQuery pageQuery) {
+        return completionRepository
+                .findPageByUserIdOrderByCompletedAtDesc(userId, pageQuery)
+                .map(this::toResponse);
     }
 
     private ExerciseCompletionResponse toResponse(ExerciseCompletion completion) {

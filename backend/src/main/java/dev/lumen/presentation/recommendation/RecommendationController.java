@@ -2,8 +2,9 @@ package dev.lumen.presentation.recommendation;
 
 import dev.lumen.application.recommendation.RecommendationService;
 import dev.lumen.application.recommendation.RecommendationSummaryResponse;
+import dev.lumen.presentation.shared.PageParameters;
+import dev.lumen.presentation.shared.PageResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import java.util.UUID;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,7 +32,8 @@ public class RecommendationController {
     }
 
     @GetMapping
-    public List<RecommendationSummaryResponse> history(@PathVariable UUID userId) {
-        return recommendationService.getHistory(userId);
+    public PageResponse<RecommendationSummaryResponse> history(
+            @PathVariable UUID userId, PageParameters pageParameters) {
+        return PageResponse.from(recommendationService.getHistory(userId, pageParameters.toPageQuery()));
     }
 }

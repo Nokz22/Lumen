@@ -9,6 +9,8 @@ import dev.lumen.domain.recommendation.Recommendation;
 import dev.lumen.domain.recommendation.RecommendationNotification;
 import dev.lumen.domain.recommendation.RecommendationNotifier;
 import dev.lumen.domain.recommendation.RecommendationRepository;
+import dev.lumen.domain.shared.PageQuery;
+import dev.lumen.domain.shared.PagedResult;
 import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -52,11 +54,11 @@ public class RecommendationService {
     }
 
     @Transactional(readOnly = true)
-    public List<RecommendationSummaryResponse> getHistory(UUID userId) {
-        return recommendationRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
+    public PagedResult<RecommendationSummaryResponse> getHistory(UUID userId, PageQuery pageQuery) {
+        return recommendationRepository
+                .findPageByUserIdOrderByCreatedAtDesc(userId, pageQuery)
                 .map(r -> new RecommendationSummaryResponse(
-                        r.getId(), r.getExerciseId(), r.getReason(), r.getCreatedAt()))
-                .toList();
+                        r.getId(), r.getExerciseId(), r.getReason(), r.getCreatedAt()));
     }
 
     private void recommend(MoodCheckInSubmittedEvent event, ExerciseCategory category, String reason) {

@@ -3,9 +3,10 @@ package dev.lumen.presentation.exercise;
 import dev.lumen.application.exercise.ExerciseCompletionResponse;
 import dev.lumen.application.exercise.ExerciseCompletionService;
 import dev.lumen.presentation.exercise.dto.CompleteExerciseRequest;
+import dev.lumen.presentation.shared.PageParameters;
+import dev.lumen.presentation.shared.PageResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.List;
 import java.util.UUID;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,7 +37,8 @@ public class ExerciseCompletionController {
     }
 
     @GetMapping
-    public List<ExerciseCompletionResponse> history(@PathVariable UUID userId) {
-        return completionService.getHistory(userId);
+    public PageResponse<ExerciseCompletionResponse> history(
+            @PathVariable UUID userId, PageParameters pageParameters) {
+        return PageResponse.from(completionService.getHistory(userId, pageParameters.toPageQuery()));
     }
 }

@@ -9,12 +9,13 @@ import dev.lumen.domain.companion.ConversationRole;
 import dev.lumen.domain.crisis.TriggerSource;
 import dev.lumen.domain.observability.GuardrailLayer;
 import dev.lumen.domain.observability.SafetyMetrics;
+import dev.lumen.domain.shared.PageQuery;
+import dev.lumen.domain.shared.PagedResult;
 import dev.lumen.domain.user.ConsentRequiredException;
 import dev.lumen.domain.user.ConsentType;
 import dev.lumen.domain.user.User;
 import dev.lumen.domain.user.UserNotFoundException;
 import dev.lumen.domain.user.UserRepository;
-import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -79,13 +80,18 @@ public class ConversationService {
     }
 
     @Transactional(readOnly = true)
-    public List<ConversationMessageResponse> getHistory(UUID userId) {
+    /**
+     * Newest first, unlike the ascending read the LLM context builder uses. A chat opens at
+     * the bottom, so the first page a client needs is the most recent one; ordering it the
+     * other way would make page 0 the oldest messages a person ever sent.
+     */
+    public PagedResult<ConversationMessageResponse> getHistory(UUID userId, PageQuery pageQuery) {
         if (userRepository.findById(userId).isEmpty()) {
             throw new UserNotFoundException(userId);
         }
-        return conversationMessageRepository.findByUserIdOrderByCreatedAtAsc(userId).stream()
-                .map(this::toResponse)
-                .toList();
+        return conversationMessageRepository
+                .findPageByUserIdOrderByCreatedAtDesc(userId, pageQuery)
+                .map(this::toResponse);
     }
 
     private void scheduleResponseAfterCommit(UUID userId) {

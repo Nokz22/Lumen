@@ -5,10 +5,11 @@ import dev.lumen.application.assessment.AssessmentSubmissionResult;
 import dev.lumen.application.assessment.AssessmentSummaryResponse;
 import dev.lumen.domain.assessment.AssessmentType;
 import dev.lumen.presentation.assessment.dto.SubmitAssessmentRequest;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import dev.lumen.presentation.shared.PageParameters;
+import dev.lumen.presentation.shared.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.List;
 import java.util.UUID;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -53,7 +54,8 @@ public class AssessmentController {
     }
 
     @GetMapping
-    public List<AssessmentSummaryResponse> history(@PathVariable UUID userId) {
-        return assessmentService.getHistory(userId);
+    public PageResponse<AssessmentSummaryResponse> history(
+            @PathVariable UUID userId, PageParameters pageParameters) {
+        return PageResponse.from(assessmentService.getHistory(userId, pageParameters.toPageQuery()));
     }
 }

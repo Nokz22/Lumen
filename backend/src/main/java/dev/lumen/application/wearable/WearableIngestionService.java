@@ -1,6 +1,8 @@
 package dev.lumen.application.wearable;
 
 import dev.lumen.application.consent.ConsentService;
+import dev.lumen.domain.shared.PageQuery;
+import dev.lumen.domain.shared.PagedResult;
 import dev.lumen.domain.user.ConsentRequiredException;
 import dev.lumen.domain.user.ConsentType;
 import dev.lumen.domain.user.UserNotFoundException;
@@ -75,11 +77,11 @@ public class WearableIngestionService {
     }
 
     @Transactional(readOnly = true)
-    public List<WearableReadingResponse> getHistory(UUID userId) {
+    public PagedResult<WearableReadingResponse> getHistory(UUID userId, PageQuery pageQuery) {
         requireUser(userId);
-        return wearableReadingRepository.findByUserIdOrderByRecordedAtDesc(userId).stream()
-                .map(this::toResponse)
-                .toList();
+        return wearableReadingRepository
+                .findPageByUserIdOrderByRecordedAtDesc(userId, pageQuery)
+                .map(this::toResponse);
     }
 
     private void requireUser(UUID userId) {

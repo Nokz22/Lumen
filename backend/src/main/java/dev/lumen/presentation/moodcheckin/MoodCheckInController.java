@@ -3,9 +3,10 @@ package dev.lumen.presentation.moodcheckin;
 import dev.lumen.application.moodcheckin.MoodCheckInResponse;
 import dev.lumen.application.moodcheckin.MoodCheckInService;
 import dev.lumen.presentation.moodcheckin.dto.MoodCheckInRequest;
+import dev.lumen.presentation.shared.PageParameters;
+import dev.lumen.presentation.shared.PageResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.List;
 import java.util.UUID;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,7 +47,7 @@ public class MoodCheckInController {
     }
 
     @GetMapping
-    public List<MoodCheckInResponse> history(@PathVariable UUID userId) {
-        return moodCheckInService.getHistory(userId);
+    public PageResponse<MoodCheckInResponse> history(@PathVariable UUID userId, PageParameters pageParameters) {
+        return PageResponse.from(moodCheckInService.getHistory(userId, pageParameters.toPageQuery()));
     }
 }

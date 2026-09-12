@@ -4,10 +4,11 @@ import dev.lumen.application.companion.ConversationMessageResponse;
 import dev.lumen.application.companion.ConversationService;
 import dev.lumen.application.companion.ConversationSubmissionResult;
 import dev.lumen.presentation.companion.dto.SendMessageRequest;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import dev.lumen.presentation.shared.PageParameters;
+import dev.lumen.presentation.shared.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.List;
 import java.util.UUID;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,7 +51,8 @@ public class ConversationController {
     }
 
     @GetMapping
-    public List<ConversationMessageResponse> history(@PathVariable UUID userId) {
-        return conversationService.getHistory(userId);
+    public PageResponse<ConversationMessageResponse> history(
+            @PathVariable UUID userId, PageParameters pageParameters) {
+        return PageResponse.from(conversationService.getHistory(userId, pageParameters.toPageQuery()));
     }
 }

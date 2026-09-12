@@ -8,6 +8,8 @@ import dev.lumen.domain.moodcheckin.MoodCheckInRepository;
 import dev.lumen.domain.moodcheckin.MoodEmotion;
 import dev.lumen.domain.recommendation.MoodCheckInEventPublisher;
 import dev.lumen.domain.recommendation.MoodCheckInSubmittedEvent;
+import dev.lumen.domain.shared.PageQuery;
+import dev.lumen.domain.shared.PagedResult;
 import dev.lumen.domain.user.ConsentRequiredException;
 import dev.lumen.domain.user.ConsentType;
 import dev.lumen.domain.user.User;
@@ -16,7 +18,6 @@ import dev.lumen.domain.user.UserRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -94,15 +95,15 @@ public class MoodCheckInService {
     // transaction leaves Hibernate in FlushMode.MANUAL, which drops that insert without
     // an error. Marking it read-only made the audit log quietly stop recording reads.
     @Transactional
-    public List<MoodCheckInResponse> getHistory(UUID userId) {
+    public PagedResult<MoodCheckInResponse> getHistory(UUID userId, PageQuery pageQuery) {
         if (userRepository.findById(userId).isEmpty()) {
             throw new UserNotFoundException(userId);
         }
         requireHealthDataConsent(userId);
         auditLogService.record(userId, userId, AuditAction.VIEW_MOOD_HISTORY);
-        return moodCheckInRepository.findByUserIdOrderByCheckInDateDesc(userId).stream()
-                .map(mapper::toResponse)
-                .toList();
+        return moodCheckInRepository
+                .findPageByUserIdOrderByCheckInDateDesc(userId, pageQuery)
+                .map(mapper::toResponse);
     }
 
     private void requireHealthDataConsent(UUID userId) {

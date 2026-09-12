@@ -2,8 +2,9 @@ package dev.lumen.presentation.admin;
 
 import dev.lumen.application.user.UserQueryService;
 import dev.lumen.application.user.UserSummaryResponse;
+import dev.lumen.presentation.shared.PageParameters;
+import dev.lumen.presentation.shared.PageResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,7 +29,7 @@ public class AdminController {
     }
 
     @GetMapping("/users")
-    public List<UserSummaryResponse> listUsers() {
-        return userQueryService.listAll();
+    public PageResponse<UserSummaryResponse> listUsers(PageParameters pageParameters) {
+        return PageResponse.from(userQueryService.list(pageParameters.toPageQuery()));
     }
 }

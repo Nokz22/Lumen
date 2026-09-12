@@ -3,6 +3,8 @@ package dev.lumen.presentation.wearable;
 import dev.lumen.application.wearable.WearableIngestionService;
 import dev.lumen.application.wearable.WearableReadingItem;
 import dev.lumen.application.wearable.WearableReadingResponse;
+import dev.lumen.presentation.shared.PageParameters;
+import dev.lumen.presentation.shared.PageResponse;
 import dev.lumen.presentation.wearable.dto.IngestWearableReadingsRequest;
 import dev.lumen.presentation.wearable.dto.SimulateWearableReadingsRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -48,7 +50,8 @@ public class WearableController {
     }
 
     @GetMapping
-    public List<WearableReadingResponse> history(@PathVariable UUID userId) {
-        return wearableIngestionService.getHistory(userId);
+    public PageResponse<WearableReadingResponse> history(
+            @PathVariable UUID userId, PageParameters pageParameters) {
+        return PageResponse.from(wearableIngestionService.getHistory(userId, pageParameters.toPageQuery()));
     }
 }

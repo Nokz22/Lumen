@@ -8,6 +8,7 @@ import dev.lumen.domain.assessment.InvalidAssessmentSubmissionException;
 import dev.lumen.domain.crisis.InvalidRiskEventTransitionException;
 import dev.lumen.domain.crisis.RiskEventNotFoundException;
 import dev.lumen.domain.exercise.ExerciseNotFoundException;
+import dev.lumen.domain.shared.InvalidPageRequestException;
 import dev.lumen.domain.user.ConsentRequiredException;
 import dev.lumen.domain.user.EmailAlreadyRegisteredException;
 import dev.lumen.domain.user.UnderageRegistrationException;
@@ -141,6 +142,12 @@ public class GlobalExceptionHandler {
      * deliberately generic: the parser's own message quotes the offending input back, and
      * the offending input here is a person's questionnaire answers or chat message.
      */
+    /** A page size of 5000 or a negative index is a bad request, not a server problem. */
+    @ExceptionHandler(InvalidPageRequestException.class)
+    public ProblemDetail handleInvalidPageRequest(InvalidPageRequestException exception) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage());
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ProblemDetail handleUnreadableBody() {
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Malformed request body");
