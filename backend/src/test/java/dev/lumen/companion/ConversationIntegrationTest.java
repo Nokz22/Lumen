@@ -132,10 +132,12 @@ class ConversationIntegrationTest {
 
         JsonNode history = waitForAssistantReply(user);
 
+        // Newest first: a page of a conversation starts at the most recent message, which
+        // is why the client reverses it before rendering rather than paging backwards.
         assertThat(history).hasSize(2);
-        assertThat(history.get(0).get("role").asText()).isEqualTo("USER");
-        assertThat(history.get(1).get("role").asText()).isEqualTo("ASSISTANT");
-        assertThat(history.get(1).get("content").asText()).isNotBlank();
+        assertThat(history.get(0).get("role").asText()).isEqualTo("ASSISTANT");
+        assertThat(history.get(0).get("content").asText()).isNotBlank();
+        assertThat(history.get(1).get("role").asText()).isEqualTo("USER");
     }
 
     @Test
