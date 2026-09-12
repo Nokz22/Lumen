@@ -141,7 +141,12 @@ spring:
     # DATABASE_URL of their own in postgres://user:pass@host/db form, which is not a
     # JDBC URL. Reusing that name means the platform silently supplies a value the
     # driver cannot parse. The name says which format is expected.
-    url: ${DATABASE_JDBC_URL}
+    #
+    # Either give the whole URL, or give the parts. The parts exist because a platform
+    # blueprint can wire host/port/name straight from its managed database, while a
+    # single URL has to be assembled and pasted by hand — and hand-assembling a JDBC URL
+    # is the step this variable was named to stop people getting wrong.
+    url: ${DATABASE_JDBC_URL:jdbc:postgresql://${DATABASE_HOST}:${DATABASE_PORT:5432}/${DATABASE_NAME}}
     username: ${DATABASE_USERNAME}
     password: ${DATABASE_PASSWORD}
   jpa:

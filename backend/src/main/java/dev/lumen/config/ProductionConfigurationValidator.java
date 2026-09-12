@@ -34,7 +34,6 @@ public class ProductionConfigurationValidator implements EnvironmentPostProcesso
     private static final int AES_256_KEY_BYTES = 32;
 
     private static final List<String> REQUIRED_VARIABLES = List.of(
-            "DATABASE_JDBC_URL",
             "DATABASE_USERNAME",
             "DATABASE_PASSWORD",
             "RABBITMQ_HOST",
@@ -65,11 +64,27 @@ public class ProductionConfigurationValidator implements EnvironmentPostProcesso
                         + " secret again");
             }
         }
+        describeMissingDatabaseLocation(environment).ifPresent(problems::add);
         describeUnusableEncryptionKey(environment.getProperty(ENCRYPTION_KEY)).ifPresent(problems::add);
 
         if (!problems.isEmpty()) {
             throw new IllegalStateException("Refusing to start with profile 'prod': " + String.join("; ", problems));
         }
+    }
+
+    /**
+     * Either the whole JDBC URL, or the parts a platform blueprint can wire directly from
+     * its managed database. Checked together rather than as two independent required
+     * variables, so supplying one valid form is never reported as three missing ones.
+     */
+    private Optional<String> describeMissingDatabaseLocation(ConfigurableEnvironment environment) {
+        if (StringUtils.hasText(environment.getProperty("DATABASE_JDBC_URL"))
+                || (StringUtils.hasText(environment.getProperty("DATABASE_HOST"))
+                        && StringUtils.hasText(environment.getProperty("DATABASE_NAME")))) {
+            return Optional.empty();
+        }
+        return Optional.of("the database location is not set: give DATABASE_JDBC_URL, or give"
+                + " DATABASE_HOST and DATABASE_NAME (with DATABASE_PORT if it is not 5432)");
     }
 
     /**

@@ -55,7 +55,7 @@ class ProductionConfigurationValidatorTest {
     void shouldNameEveryMissingVariableInASingleFailure() {
         assertThatThrownBy(() -> validator.postProcessEnvironment(environmentWith("prod"), null))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("DATABASE_JDBC_URL is not set")
+                .hasMessageContaining("the database location is not set")
                 .hasMessageContaining("JWT_SECRET is not set")
                 .hasMessageContaining("ENCRYPTION_KEY is not set")
                 .hasMessageContaining("CORS_ALLOWED_ORIGINS is not set");
@@ -87,6 +87,31 @@ class ProductionConfigurationValidatorTest {
      * Nothing reads the key at startup, so a malformed one boots green and only fails when
      * somebody first saves a note or a chat message. That has to be caught before traffic.
      */
+    /** A blueprint wires host, port and name from its managed database; a person pastes a URL. */
+    @Test
+    void shouldAcceptTheDatabaseLocationGivenAsSeparateParts() {
+        MockEnvironment environment = environmentWith("prod");
+        withCompleteConfiguration(environment);
+        environment.setProperty("DATABASE_JDBC_URL", "");
+        environment.setProperty("DATABASE_HOST", "db.internal");
+        environment.setProperty("DATABASE_NAME", "lumen");
+
+        assertThatCode(() -> validator.postProcessEnvironment(environment, null))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    void shouldRefuseHalfADatabaseLocation() {
+        MockEnvironment environment = environmentWith("prod");
+        withCompleteConfiguration(environment);
+        environment.setProperty("DATABASE_JDBC_URL", "");
+        environment.setProperty("DATABASE_HOST", "db.internal");
+
+        assertThatThrownBy(() -> validator.postProcessEnvironment(environment, null))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("the database location is not set");
+    }
+
     @Test
     void shouldRefuseAnEncryptionKeyThatIsNotUsableForAes256() {
         MockEnvironment environment = environmentWith("prod");
