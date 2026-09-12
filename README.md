@@ -80,7 +80,8 @@ Ethically, wellbeing software is a domain where a shortcut in engineering can be
 | Pagination on listing endpoints | ✅ Implemented |
 | Observability (Micrometer / Prometheus) | ✅ Implemented |
 | Dark/light themes, WCAG AA contrast, frontend tests | ✅ Implemented |
-| Live deployment (Render / Vercel) | 📋 Planned |
+| Deployment configuration (Render / Vercel / CD) | ✅ Implemented |
+| Live instance | 📋 Needs platform accounts |
 
 ---
 
@@ -484,6 +485,25 @@ platform to poll.
 
 ---
 
+## Deploying
+
+`render.yaml` and `frontend/vercel.json` declare the API with its database and the
+frontend; `.github/workflows/deploy.yml` deploys them only after CI passes on `main`,
+rather than letting each platform ship whatever was last pushed. Full walkthrough,
+including the parts that need accounts: **[docs/deployment.md](docs/deployment.md)**.
+
+Two things worth knowing before starting:
+
+- **RabbitMQ is not on Render**, which has no managed broker. Rather than drop the
+  messaging architecture the project exists to demonstrate, point `RABBITMQ_*` at a broker
+  elsewhere. Without one the app still runs and check-ins still save — publishing is
+  best-effort — but the recommendation engine has nothing to consume, so the suggestion
+  feed stays empty.
+- **A free instance sleeps when idle.** The first request after that pays tens of seconds
+  to wake it, during which the frontend looks broken rather than slow.
+
+---
+
 ## Environment Variables
 
 Every variable is documented in `.env.example`, split into a development block and a
@@ -574,6 +594,7 @@ docs/
 | [docs/diagrams/domain-model-phase1.md](docs/diagrams/domain-model-phase1.md) | Domain model, Phase 1 (Mermaid) |
 | [docs/diagrams/domain-model-phase4.md](docs/diagrams/domain-model-phase4.md) | Domain model, Exercise/Recommendation (Mermaid) |
 | [docs/diagrams/crisis-flow-state-machine.md](docs/diagrams/crisis-flow-state-machine.md) | Assessment/RiskEvent state machine (Mermaid) |
+| [docs/deployment.md](docs/deployment.md) | How to deploy it, and what needs an account |
 | [docs/threat-model.md](docs/threat-model.md) | Asset → threat → mitigation |
 
 ---
@@ -592,7 +613,8 @@ docs/
   - ✅ Production images, `prod` profile, compose topology
   - ✅ Metrics, rate limiting, dark/light themes, frontend tests, C4 complete
   - ✅ Pagination on every listing that grows with use
-  - 📋 Live deployment
+  - ✅ Deployment configuration and CD pipeline
+  - 📋 A live instance (needs platform accounts)
 
 ---
 
