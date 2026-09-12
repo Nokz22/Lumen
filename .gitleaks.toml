@@ -1,0 +1,31 @@
+# Gitleaks configuration for Lumen.
+#
+# The default rule set is kept in full; this file only records the handful of
+# strings that look like credentials to a scanner but are deliberately public.
+
+title = "Lumen"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = """
+ProductionConfigurationValidator and its test.
+
+The dev profile ships with a JWT secret and an AES-256 key committed to the
+repository so that `docker compose up` works with no setup. Those two values are
+public by design, and the validator exists precisely because they are: it holds
+a copy of each so it can refuse to start the `prod` profile when a deployment
+still carries them. Its test then asserts that refusal, and uses a throwaway
+base64 value -- "0123456789abcdef0123456789abcdef" encoded -- to prove that a
+well-formed key is accepted.
+
+Redacting them would mean deleting the check that keeps the development
+credentials out of production, which is the opposite of what a secret scan is
+for. No other path is allowlisted, so a real credential committed anywhere else
+still fails the build.
+"""
+paths = [
+  '''^backend/src/main/java/dev/lumen/config/ProductionConfigurationValidator\.java$''',
+  '''^backend/src/test/java/dev/lumen/config/ProductionConfigurationValidatorTest\.java$''',
+]
