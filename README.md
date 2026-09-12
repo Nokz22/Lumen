@@ -77,6 +77,7 @@ Ethically, wellbeing software is a domain where a shortcut in engineering can be
 | Real wearable adapters (Fitbit / Garmin / Apple Health) | 📋 Planned |
 | Production images, `prod` profile & compose topology | ✅ Implemented |
 | Rate limiting on public and LLM endpoints | ✅ Implemented |
+| Pagination on listing endpoints | ✅ Implemented |
 | Observability (Micrometer / Prometheus) | ✅ Implemented |
 | Dark/light themes, WCAG AA contrast, frontend tests | ✅ Implemented |
 | Live deployment (Render / Vercel) | 📋 Planned |
@@ -424,6 +425,29 @@ Two details worth knowing before the first deploy:
 - **`VITE_API_BASE_URL` is a build argument.** Vite inlines it into the bundle, so pointing
   the frontend at a different backend means rebuilding its image, not restarting it.
 
+## Pagination
+
+Every listing that grows with use — check-ins, instruments, recommendations, exercise
+completions, wearable readings, conversation messages and the admin user list — returns a
+page rather than an entire history:
+
+```json
+{ "content": [ ... ], "page": 0, "size": 20, "totalElements": 55, "totalPages": 3, "hasNext": true }
+```
+
+`page` defaults to 0 and `size` to 20, capped at 100. The cap is enforced in the domain's
+`PageQuery` constructor rather than in a controller, so it holds for every caller rather
+than only the ones arriving over HTTP — without it, `size=1000000` turns a paginated
+endpoint back into the unbounded one it replaced.
+
+Two listings are deliberately not paginated: the exercise library is a fixed reference table
+of twelve rows, and the wearable insight endpoint returns at most three computed results.
+
+**The data export is never paginated.** Pagination applies to the screens; the copy of their
+own data a person is entitled to has to be complete (ADR-0011), and a test asserts it.
+
+---
+
 ## Observability and Rate Limiting
 
 `/actuator/prometheus` exposes the usual JVM, connection-pool, HTTP and Resilience4j series,
@@ -567,7 +591,8 @@ docs/
   - ✅ Data-subject rights (export, erasure), OpenAPI contract
   - ✅ Production images, `prod` profile, compose topology
   - ✅ Metrics, rate limiting, dark/light themes, frontend tests, C4 complete
-  - 📋 Live deployment, and pagination on the listing endpoints
+  - ✅ Pagination on every listing that grows with use
+  - 📋 Live deployment
 
 ---
 
