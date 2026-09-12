@@ -2,6 +2,9 @@ package dev.lumen.infrastructure.persistence.moodcheckin;
 
 import dev.lumen.domain.moodcheckin.MoodCheckIn;
 import dev.lumen.domain.moodcheckin.MoodCheckInRepository;
+import dev.lumen.domain.shared.PageQuery;
+import dev.lumen.domain.shared.PagedResult;
+import dev.lumen.infrastructure.persistence.shared.SpringDataPaging;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -35,5 +38,11 @@ class MoodCheckInRepositoryImpl implements MoodCheckInRepository {
     @Override
     public void deleteByUserId(UUID userId) {
         jpaRepository.deleteByUserId(userId);
+    }
+
+    @Override
+    public PagedResult<MoodCheckIn> findPageByUserIdOrderByCheckInDateDesc(UUID userId, PageQuery pageQuery) {
+        return SpringDataPaging.toPagedResult(
+                jpaRepository.findPageByUserIdOrderByCheckInDateDesc(userId, SpringDataPaging.toPageable(pageQuery)));
     }
 }

@@ -4,6 +4,9 @@ import dev.lumen.domain.assessment.Assessment;
 import dev.lumen.domain.assessment.AssessmentRepository;
 import dev.lumen.domain.assessment.AssessmentStatus;
 import dev.lumen.domain.assessment.AssessmentType;
+import dev.lumen.domain.shared.PageQuery;
+import dev.lumen.domain.shared.PagedResult;
+import dev.lumen.infrastructure.persistence.shared.SpringDataPaging;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -47,5 +50,11 @@ class AssessmentRepositoryImpl implements AssessmentRepository {
     @Override
     public void deleteByUserId(UUID userId) {
         jpaRepository.deleteByUserId(userId);
+    }
+
+    @Override
+    public PagedResult<Assessment> findPageByUserIdOrderByCreatedAtDesc(UUID userId, PageQuery pageQuery) {
+        return SpringDataPaging.toPagedResult(
+                jpaRepository.findPageByUserIdOrderByCreatedAtDesc(userId, SpringDataPaging.toPageable(pageQuery)));
     }
 }

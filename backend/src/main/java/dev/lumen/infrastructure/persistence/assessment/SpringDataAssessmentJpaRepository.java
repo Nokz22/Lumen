@@ -6,6 +6,8 @@ import dev.lumen.domain.assessment.AssessmentType;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -28,4 +30,8 @@ interface SpringDataAssessmentJpaRepository extends JpaRepository<Assessment, UU
     @Modifying
     @Query("DELETE FROM Assessment a WHERE a.user.id = :userId")
     void deleteByUserId(@Param("userId") UUID userId);
+
+    @Query(value = "SELECT a FROM Assessment a WHERE a.user.id = :userId ORDER BY a.createdAt DESC",
+            countQuery = "SELECT count(a) FROM Assessment a WHERE a.user.id = :userId")
+    Page<Assessment> findPageByUserIdOrderByCreatedAtDesc(@Param("userId") UUID userId, Pageable pageable);
 }
