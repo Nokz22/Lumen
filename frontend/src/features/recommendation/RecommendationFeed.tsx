@@ -5,16 +5,16 @@ import { useRecommendationHistory, usePrependRecommendation } from './useRecomme
 import { useRecommendationSocket } from './useRecommendationSocket'
 import type { RecommendationSummary } from '../../types/recommendation'
 
-/** Same reasoning as MoodHistory: suggestions accumulate, the screen should not. */
+/** Same reasoning as MoodHistory: suggestions accumulate, the request should not. */
 const VISIBLE_RECOMMENDATIONS = 5
 
 export function RecommendationFeed() {
   const { t } = useTranslation()
   const { user } = useAuth()
-  const { data, isLoading, isError } = useRecommendationHistory(user!.id)
+  const { data, isLoading, isError } = useRecommendationHistory(user!.id, VISIBLE_RECOMMENDATIONS)
   const { data: exercises } = useExercises()
   const completeExercise = useCompleteExercise(user!.id)
-  const prependRecommendation = usePrependRecommendation(user!.id)
+  const prependRecommendation = usePrependRecommendation(user!.id, VISIBLE_RECOMMENDATIONS)
 
   useRecommendationSocket(prependRecommendation)
 
@@ -40,11 +40,11 @@ export function RecommendationFeed() {
         </p>
       )}
 
-      {data && data.length === 0 && <p>{t('recommendation.feed.empty')}</p>}
+      {data && data.totalElements === 0 && <p>{t('recommendation.feed.empty')}</p>}
 
-      {data && data.length > 0 && (
+      {data && data.content.length > 0 && (
         <ul role="list" className="flex flex-col gap-3">
-          {data.slice(0, VISIBLE_RECOMMENDATIONS).map((recommendation) => (
+          {data.content.map((recommendation) => (
             <li
               key={recommendation.id}
               className="flex flex-col gap-1 rounded-xl border border-[var(--color-border)] px-4 py-3 text-sm"
@@ -69,11 +69,11 @@ export function RecommendationFeed() {
         </ul>
       )}
 
-      {data && data.length > VISIBLE_RECOMMENDATIONS && (
+      {data && data.totalElements > data.content.length && (
         <p className="text-sm text-[var(--color-text-muted)]">
           {t('recommendation.feed.showingRecent', {
-            shown: VISIBLE_RECOMMENDATIONS,
-            total: data.length,
+            shown: data.content.length,
+            total: data.totalElements,
           })}
         </p>
       )}

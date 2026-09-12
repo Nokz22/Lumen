@@ -6,6 +6,13 @@ import { acknowledgeRiskEvent } from '../../api/riskEvents'
 const companionConsentKey = (userId: string) => ['companion-consent', userId]
 export const conversationHistoryKey = (userId: string) => ['conversation-history', userId]
 
+/**
+ * How much of the transcript the chat holds on screen. The whole conversation is
+ * still on the server and still feeds the model's context window — this is what the
+ * browser renders, not what exists.
+ */
+export const CONVERSATION_PAGE_SIZE = 50
+
 export function useCompanionConsent(userId: string) {
   return useQuery({
     queryKey: companionConsentKey(userId),
@@ -27,7 +34,7 @@ export function useGrantCompanionConsent(userId: string) {
 export function useConversationHistory(userId: string, enabled: boolean) {
   return useQuery({
     queryKey: conversationHistoryKey(userId),
-    queryFn: () => fetchConversationHistory(userId),
+    queryFn: () => fetchConversationHistory(userId, { size: CONVERSATION_PAGE_SIZE }),
     enabled,
   })
 }

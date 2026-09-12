@@ -40,7 +40,10 @@ export function BreathingSession({
 }) {
   const { t } = useTranslation()
   const phases = useMemo(() => buildPhases(exercise), [exercise])
-  const cycleSeconds = useMemo(() => phases.reduce((sum, phase) => sum + phase.seconds, 0), [phases])
+  const cycleSeconds = useMemo(
+    () => phases.reduce((sum, phase) => sum + phase.seconds, 0),
+    [phases],
+  )
   const totalCycles = useMemo(
     () => Math.max(1, Math.round((exercise.durationMinutes * 60) / cycleSeconds)),
     [exercise.durationMinutes, cycleSeconds],
@@ -109,7 +112,9 @@ export function BreathingSession({
             transitionDuration: done ? '400ms' : `${currentPhase.seconds}s`,
           }}
         >
-          {!done && <span aria-hidden="true">{t(`exercise.session.phase.${currentPhase.type}`)}</span>}
+          {!done && (
+            <span aria-hidden="true">{t(`exercise.session.phase.${currentPhase.type}`)}</span>
+          )}
         </div>
       </div>
 

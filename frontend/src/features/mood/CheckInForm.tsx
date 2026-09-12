@@ -17,7 +17,13 @@ export function CheckInForm() {
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
-    submitCheckIn.mutate({ emotion, energyLevel, sleepHours, sleepQuality, note: note || undefined })
+    submitCheckIn.mutate({
+      emotion,
+      energyLevel,
+      sleepHours,
+      sleepQuality,
+      note: note || undefined,
+    })
   }
 
   return (

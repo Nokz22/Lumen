@@ -1,4 +1,5 @@
 import { apiFetch } from './client'
+import { pageQueryString, type Page, type PageParams } from '../types/page'
 import type {
   AssessmentSubmissionResult,
   AssessmentSummary,
@@ -19,6 +20,11 @@ export function submitAssessment(
   )
 }
 
-export function fetchAssessmentHistory(userId: string): Promise<AssessmentSummary[]> {
-  return apiFetch<AssessmentSummary[]>(`/api/v1/users/${userId}/assessments`)
+export function fetchAssessmentHistory(
+  userId: string,
+  params?: PageParams,
+): Promise<Page<AssessmentSummary>> {
+  return apiFetch<Page<AssessmentSummary>>(
+    `/api/v1/users/${userId}/assessments${pageQueryString(params)}`,
+  )
 }
