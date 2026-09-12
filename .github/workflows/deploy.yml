@@ -1,0 +1,40 @@
+name: Deploy
+
+# Runs only after CI has finished on main, and only if it passed. Both platforms can
+# deploy on every push by themselves; that would ship a red build to whoever is using
+# the app, so their auto-deploy is off and this is the only thing that triggers one.
+on:
+  workflow_run:
+    workflows: ['CI']
+    types: [completed]
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Deploy backend and frontend
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Deploy the API to Render
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        # Skipped rather than failed when the secret is absent: the repository should
+        # stay green for anyone who forks it and has no deployment of their own.
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "RENDER_DEPLOY_HOOK_URL is not set — skipping the API deploy."
+            exit 0
+          fi
+          curl --fail --silent --show-error --request POST "$RENDER_DEPLOY_HOOK_URL"
+          echo "Requested a Render deploy."
+
+      - name: Deploy the frontend to Vercel
+        env:
+          VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$VERCEL_DEPLOY_HOOK_URL" ]; then
+            echo "VERCEL_DEPLOY_HOOK_URL is not set — skipping the frontend deploy."
+            exit 0
+          fi
+          curl --fail --silent --show-error --request POST "$VERCEL_DEPLOY_HOOK_URL"
+          echo "Requested a Vercel deploy."
