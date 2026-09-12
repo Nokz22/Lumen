@@ -78,7 +78,8 @@ Ethically, wellbeing software is a domain where a shortcut in engineering can be
 | Production images, `prod` profile & compose topology | ✅ Implemented |
 | Rate limiting on public and LLM endpoints | ✅ Implemented |
 | Observability (Micrometer / Prometheus) | ✅ Implemented |
-| Production deployment & hardening | ⏳ In Progress (Phase 7) |
+| Dark/light themes, WCAG AA contrast, frontend tests | ✅ Implemented |
+| Live deployment (Render / Vercel) | 📋 Planned |
 
 ---
 
@@ -216,6 +217,7 @@ Full list, including infrastructure-level decisions (Flyway, MapStruct): **[docs
 - Vite
 - Tailwind CSS
 - TanStack Query
+- Vitest + React Testing Library
 - react-i18next (English default, European Portuguese as an in-app option)
 
 ### Infrastructure
@@ -282,6 +284,11 @@ C4Container
     Rel(api, crisisResources, "Presents to USER when a RiskEvent is detected", "table lookup")
 ```
 
+The **[Component-level view](docs/diagrams/c4-component.md)** goes one level deeper into the
+backend and traces the clinical-safety path specifically — where each of the three guardrail
+layers sits, why every risk detection funnels through one service, and why the rate limiter
+is in the diagram for what it does *not* touch.
+
 Full diagram set, including the Context-level view and domain models: **[docs/diagrams/](docs/diagrams/)**.
 
 ---
@@ -295,6 +302,7 @@ Full diagram set, including the Context-level view and domain models: **[docs/di
 | Java version | 17 (Temurin) |
 | Node version | 20 |
 | Containers | 2 (PostgreSQL 16, RabbitMQ 3) via Docker Compose |
+| Frontend tests | 30 (Vitest + React Testing Library) |
 | CI pipeline | GitHub Actions — 3 jobs (backend, frontend, secret scanning) |
 | Latest release | None yet — continuous phase-based development, see [Roadmap](#roadmap) |
 
@@ -492,14 +500,23 @@ Frontend
 ```bash
 npm run lint
 
+npm test
+
 npm run build
 ```
 
 Includes:
 
 - ESLint
+- Vitest + React Testing Library
 - TypeScript type checking
 - Production build
+
+The frontend tests deliberately cover the screens where a UI bug is not cosmetic: the crisis
+screen (every resource reachable, acknowledgment required, never tells the person what they
+are), account deletion (unreachable without typing the confirmation), the consent gate, and
+the themes. One of them reads `index.css` and checks every colour pair against WCAG 2.1 AA —
+it is how the light theme's primary button was found sitting at 3.94:1.
 
 ---
 
@@ -529,6 +546,7 @@ docs/
 | [docs/adr/](docs/adr/) | Architecture Decision Records |
 | [docs/diagrams/c4-context.md](docs/diagrams/c4-context.md) | C4 Context diagram (Mermaid) |
 | [docs/diagrams/c4-container.md](docs/diagrams/c4-container.md) | C4 Container diagram (Mermaid) |
+| [docs/diagrams/c4-component.md](docs/diagrams/c4-component.md) | C4 Component diagram — the clinical-safety path (Mermaid) |
 | [docs/diagrams/domain-model-phase1.md](docs/diagrams/domain-model-phase1.md) | Domain model, Phase 1 (Mermaid) |
 | [docs/diagrams/domain-model-phase4.md](docs/diagrams/domain-model-phase4.md) | Domain model, Exercise/Recommendation (Mermaid) |
 | [docs/diagrams/crisis-flow-state-machine.md](docs/diagrams/crisis-flow-state-machine.md) | Assessment/RiskEvent state machine (Mermaid) |
@@ -546,6 +564,10 @@ docs/
 - ✅ Phase 5 — Wearable Integration
 - ✅ Phase 6 — AI Companion & Safety Guardrails
 - ⏳ Phase 7 — Production Readiness & Deployment
+  - ✅ Data-subject rights (export, erasure), OpenAPI contract
+  - ✅ Production images, `prod` profile, compose topology
+  - ✅ Metrics, rate limiting, dark/light themes, frontend tests, C4 complete
+  - 📋 Live deployment, and pagination on the listing endpoints
 
 ---
 
