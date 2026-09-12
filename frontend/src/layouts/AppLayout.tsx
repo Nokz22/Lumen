@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
 import { LanguageSwitcher } from '../components/LanguageSwitcher'
+import { ThemeToggle } from '../components/ThemeToggle'
 import { useAuth } from '../contexts/AuthContext'
 
 const navLinkClassName = ({ isActive }: { isActive: boolean }) =>
@@ -36,6 +37,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
               </NavLink>
             </nav>
           )}
+          <ThemeToggle />
           <LanguageSwitcher />
           {user && (
             <button

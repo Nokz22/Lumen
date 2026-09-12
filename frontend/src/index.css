@@ -1,28 +1,38 @@
 @import 'tailwindcss';
 
+/*
+ * Dark is the base, not an override (project-brief section 10). This app is opened
+ * late, often by someone with little energy, and the default should not be a bright
+ * screen. Light is a complete theme rather than an afterthought — both avoid pure
+ * black and pure white, which is what makes long reading comfortable.
+ */
 :root {
+  --color-bg: #1a1b20;
+  --color-surface: #23242b;
+  --color-text: #e4e2e8;
+  --color-text-muted: #9a97a6;
+  --color-border: #33313c;
+  --color-accent: #7fb0b0;
+  --color-accent-contrast: #12181c;
+
+  color-scheme: dark;
+  font-size: 16px;
+}
+
+:root[data-theme='light'] {
   --color-bg: #faf9f7;
   --color-surface: #ffffff;
   --color-text: #2d2b32;
   --color-text-muted: #6b6675;
   --color-border: #e6e3ea;
-  --color-accent: #4f8a8a;
+  /* Darker than it looks like it needs to be: at #4f8a8a white text on this button
+     measured 3.94:1, under the 4.5:1 WCAG 2.1 AA needs for body text. This is the
+     primary action everywhere, including the acknowledgment on the crisis screen —
+     the one button that has to be readable by someone with no energy to squint. */
+  --color-accent: #417878;
   --color-accent-contrast: #ffffff;
 
-  color-scheme: light dark;
-  font-size: 16px;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-bg: #1a1b20;
-    --color-surface: #23242b;
-    --color-text: #e4e2e8;
-    --color-text-muted: #9a97a6;
-    --color-border: #33313c;
-    --color-accent: #7fb0b0;
-    --color-accent-contrast: #12181c;
-  }
+  color-scheme: light;
 }
 
 body {

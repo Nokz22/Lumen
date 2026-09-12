@@ -246,5 +246,9 @@
       "pending": "Deleting…",
       "error": "Couldn't delete your account. Please try again."
     }
+  },
+  "theme": {
+    "switchToLight": "Switch to light theme",
+    "switchToDark": "Switch to dark theme"
   }
 }

@@ -246,5 +246,9 @@
       "pending": "A eliminar…",
       "error": "Não foi possível eliminar a tua conta. Tenta novamente."
     }
+  },
+  "theme": {
+    "switchToLight": "Mudar para tema claro",
+    "switchToDark": "Mudar para tema escuro"
   }
 }
