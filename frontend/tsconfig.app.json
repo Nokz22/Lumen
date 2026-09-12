@@ -4,7 +4,9 @@
     "target": "es2023",
     "lib": ["ES2023", "DOM"],
     "module": "esnext",
-    "types": ["vite/client"],
+    // "node" for the contrast test, which reads index.css from disk; "vitest/globals"
+    // because the test config enables globals rather than importing describe/it.
+    "types": ["vite/client", "node", "vitest/globals"],
     "allowArbitraryExtensions": true,
     "skipLibCheck": true,
 
