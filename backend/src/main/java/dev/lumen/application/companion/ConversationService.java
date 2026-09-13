@@ -7,12 +7,15 @@ import dev.lumen.domain.companion.ConversationMessage;
 import dev.lumen.domain.companion.ConversationMessageRepository;
 import dev.lumen.domain.companion.ConversationRole;
 import dev.lumen.domain.crisis.TriggerSource;
+import dev.lumen.domain.observability.GuardrailLayer;
+import dev.lumen.domain.observability.SafetyMetrics;
+import dev.lumen.domain.shared.PageQuery;
+import dev.lumen.domain.shared.PagedResult;
 import dev.lumen.domain.user.ConsentRequiredException;
 import dev.lumen.domain.user.ConsentType;
 import dev.lumen.domain.user.User;
 import dev.lumen.domain.user.UserNotFoundException;
 import dev.lumen.domain.user.UserRepository;
-import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +41,7 @@ public class ConversationService {
     private final ChatRiskClassifier chatRiskClassifier;
     private final RiskEventTriggerService riskEventTriggerService;
     private final CompanionResponseService companionResponseService;
+    private final SafetyMetrics safetyMetrics;
 
     public ConversationService(
             ConversationMessageRepository conversationMessageRepository,
@@ -45,13 +49,15 @@ public class ConversationService {
             ConsentService consentService,
             ChatRiskClassifier chatRiskClassifier,
             RiskEventTriggerService riskEventTriggerService,
-            CompanionResponseService companionResponseService) {
+            CompanionResponseService companionResponseService,
+            SafetyMetrics safetyMetrics) {
         this.conversationMessageRepository = conversationMessageRepository;
         this.userRepository = userRepository;
         this.consentService = consentService;
         this.chatRiskClassifier = chatRiskClassifier;
         this.riskEventTriggerService = riskEventTriggerService;
         this.companionResponseService = companionResponseService;
+        this.safetyMetrics = safetyMetrics;
     }
 
     @Transactional
@@ -63,6 +69,7 @@ public class ConversationService {
                 conversationMessageRepository.save(new ConversationMessage(userId, ConversationRole.USER, content));
 
         if (chatRiskClassifier.isHighRisk(content)) {
+            safetyMetrics.guardrailBlocked(GuardrailLayer.INPUT_CLASSIFIER);
             CrisisTriggerOutcome outcome =
                     riskEventTriggerService.trigger(userId, null, TriggerSource.CHAT_MESSAGE, user.getRegion());
             return new ConversationCrisisResult(outcome.riskEventId(), outcome.resources());
@@ -73,13 +80,18 @@ public class ConversationService {
     }
 
     @Transactional(readOnly = true)
-    public List<ConversationMessageResponse> getHistory(UUID userId) {
+    /**
+     * Newest first, unlike the ascending read the LLM context builder uses. A chat opens at
+     * the bottom, so the first page a client needs is the most recent one; ordering it the
+     * other way would make page 0 the oldest messages a person ever sent.
+     */
+    public PagedResult<ConversationMessageResponse> getHistory(UUID userId, PageQuery pageQuery) {
         if (userRepository.findById(userId).isEmpty()) {
             throw new UserNotFoundException(userId);
         }
-        return conversationMessageRepository.findByUserIdOrderByCreatedAtAsc(userId).stream()
-                .map(this::toResponse)
-                .toList();
+        return conversationMessageRepository
+                .findPageByUserIdOrderByCreatedAtDesc(userId, pageQuery)
+                .map(this::toResponse);
     }
 
     private void scheduleResponseAfterCommit(UUID userId) {

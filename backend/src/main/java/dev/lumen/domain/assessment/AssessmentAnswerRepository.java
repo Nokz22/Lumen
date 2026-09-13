@@ -8,4 +8,7 @@ public interface AssessmentAnswerRepository {
     List<AssessmentAnswer> saveAll(List<AssessmentAnswer> responses);
 
     List<AssessmentAnswer> findByAssessmentId(UUID assessmentId);
+
+    /** Keyed by assessment, so erasure resolves the owning user through the assessment. */
+    void deleteByUserId(UUID userId);
 }

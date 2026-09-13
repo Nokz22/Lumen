@@ -6,6 +6,7 @@ import { LoginPage } from './pages/LoginPage'
 import { RegisterPage } from './pages/RegisterPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { CompanionPage } from './pages/CompanionPage'
+import { PrivacyPage } from './pages/PrivacyPage'
 
 const queryClient = new QueryClient()
 
@@ -30,6 +31,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <CompanionPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/privacy"
+              element={
+                <ProtectedRoute>
+                  <PrivacyPage />
                 </ProtectedRoute>
               }
             />

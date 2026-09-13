@@ -1,5 +1,6 @@
 package dev.lumen.companion;
 
+import static dev.lumen.support.TestClients.distinctClient;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -20,6 +21,7 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -53,6 +55,9 @@ class ConversationIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    /** Each test signs in as its own client, so they do not share one rate-limit budget. */
+    private final RequestPostProcessor client = distinctClient();
+
     private record AuthenticatedUser(UUID userId, Cookie accessTokenCookie) {
     }
 
@@ -67,6 +72,7 @@ class ConversationIntegrationTest {
 
         MvcResult result = mockMvc.perform(post("/api/v1/auth/register")
                         .with(csrf())
+                        .with(client)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isCreated())
@@ -113,7 +119,8 @@ class ConversationIntegrationTest {
                         .cookie(user.accessTokenCookie()))
                 .andExpect(status().isOk())
                 .andReturn();
-        return objectMapper.readTree(result.getResponse().getContentAsString());
+        // The endpoint returns a page; every assertion on a history here is about the messages in it.
+        return objectMapper.readTree(result.getResponse().getContentAsString()).get("content");
     }
 
     @Test
@@ -125,10 +132,12 @@ class ConversationIntegrationTest {
 
         JsonNode history = waitForAssistantReply(user);
 
+        // Newest first: a page of a conversation starts at the most recent message, which
+        // is why the client reverses it before rendering rather than paging backwards.
         assertThat(history).hasSize(2);
-        assertThat(history.get(0).get("role").asText()).isEqualTo("USER");
-        assertThat(history.get(1).get("role").asText()).isEqualTo("ASSISTANT");
-        assertThat(history.get(1).get("content").asText()).isNotBlank();
+        assertThat(history.get(0).get("role").asText()).isEqualTo("ASSISTANT");
+        assertThat(history.get(0).get("content").asText()).isNotBlank();
+        assertThat(history.get(1).get("role").asText()).isEqualTo("USER");
     }
 
     @Test
@@ -159,6 +168,7 @@ class ConversationIntegrationTest {
 
         MvcResult result = mockMvc.perform(post("/api/v1/auth/register")
                         .with(csrf())
+                        .with(client)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isCreated())

@@ -72,11 +72,16 @@ Ethically, wellbeing software is a domain where a shortcut in engineering can be
 | PHQ-9 / GAD-7 instruments & crisis flow | ✅ Implemented |
 | Rule-based recommendation engine | ✅ Implemented |
 | Wearable ingestion (simulated provider) | ✅ Implemented |
+| Demo profile with eight weeks of synthetic history | ✅ Implemented |
 | AI companion with three-layer guardrails | ✅ Implemented |
 | Real wearable adapters (Fitbit / Garmin / Apple Health) | 📋 Planned |
-| Rate limiting on public endpoints | 📋 Planned |
-| Observability (Micrometer / Prometheus) | 📋 Planned |
-| Production deployment & hardening | ⏳ In Progress (Phase 7) |
+| Production images, `prod` profile & compose topology | ✅ Implemented |
+| Rate limiting on public and LLM endpoints | ✅ Implemented |
+| Pagination on listing endpoints | ✅ Implemented |
+| Observability (Micrometer / Prometheus) | ✅ Implemented |
+| Dark/light themes, WCAG AA contrast, frontend tests | ✅ Implemented |
+| Deployment configuration (Render / Vercel / CD) | ✅ Implemented |
+| Live instance | 📋 Needs platform accounts |
 
 ---
 
@@ -181,6 +186,8 @@ The reasoning behind every non-obvious choice is written down as it's made, not 
 | [0008](docs/adr/0008-provider-agnostic-wearable-ingestion.md) | Provider-agnostic wearable ingestion — simulator first, real adapters swap in later |
 | [0009](docs/adr/0009-conversation-memory-window-plus-summary.md) | Conversation memory as a fixed window + rolling summary, never full history replay |
 | [0010](docs/adr/0010-llm-guardrails-three-layer-defense.md) | Three-layer LLM defense — safety is never delegated to the model itself |
+| [0011](docs/adr/0011-data-subject-rights-export-and-erasure.md) | Data-subject rights — export is not gated on consent, erasure is real deletion |
+| [0012](docs/adr/0012-metrics-and-rate-limiting.md) | Metrics and rate limiting — and the crisis flow that is never rate limited |
 
 Full list, including infrastructure-level decisions (Flyway, MapStruct): **[docs/adr/](docs/adr/)**.
 
@@ -212,6 +219,7 @@ Full list, including infrastructure-level decisions (Flyway, MapStruct): **[docs
 - Vite
 - Tailwind CSS
 - TanStack Query
+- Vitest + React Testing Library
 - react-i18next (English default, European Portuguese as an in-app option)
 
 ### Infrastructure
@@ -278,6 +286,11 @@ C4Container
     Rel(api, crisisResources, "Presents to USER when a RiskEvent is detected", "table lookup")
 ```
 
+The **[Component-level view](docs/diagrams/c4-component.md)** goes one level deeper into the
+backend and traces the clinical-safety path specifically — where each of the three guardrail
+layers sits, why every risk detection funnels through one service, and why the rate limiter
+is in the diagram for what it does *not* touch.
+
 Full diagram set, including the Context-level view and domain models: **[docs/diagrams/](docs/diagrams/)**.
 
 ---
@@ -289,8 +302,9 @@ Full diagram set, including the Context-level view and domain models: **[docs/di
 | Line coverage (JaCoCo) | 87.9% |
 | Quality gate | Checkstyle (zero warnings) + JaCoCo (≥80% line, enforced in CI) |
 | Java version | 17 (Temurin) |
-| Node version | 20 |
+| Node version | 22 |
 | Containers | 2 (PostgreSQL 16, RabbitMQ 3) via Docker Compose |
+| Frontend tests | 30 (Vitest + React Testing Library) |
 | CI pipeline | GitHub Actions — 3 jobs (backend, frontend, secret scanning) |
 | Latest release | None yet — continuous phase-based development, see [Roadmap](#roadmap) |
 
@@ -348,9 +362,152 @@ Register an account at `/register`, or use the seeded **demo account** (`dev` pr
 
 ---
 
+## Running the Demo
+
+The `demo` profile fills a fresh database with eight weeks of coherent synthetic history —
+check-ins, wearable readings, engine-generated recommendations and two completed
+instruments — so the product can be understood on sight rather than after a fortnight of
+use.
+
+```bash
+docker compose up -d
+
+cd backend && ./gradlew bootRun --args='--spring.profiles.active=demo'
+```
+
+Log in with `demo@lumen.dev` / `Demo1234!`. The data tells one story: a rough few weeks
+that gradually improves, which is what makes the correlation panel say something true —
+nights of shorter sleep really are followed by lower-energy days in this data, because
+both are generated from the same underlying trend.
+
+**No crisis scenario is ever seeded.** PHQ-9 item 9 is fixed at zero and a demo database
+contains no `RiskEvent`, enforced by a test. A public instance carrying one would read
+exactly like a real person having been in danger; the crisis flow is demonstrated
+deliberately, in a controlled setting, by answering item 9 by hand.
+
+Everyone in a demo instance is invented. The profile exists so that fabricated health
+history can never reach a production database.
+
+---
+
+## Running in Production
+
+The development setup above starts only the dependencies. `docker-compose.prod.yml` builds
+and runs the whole stack — both apps as multi-stage images, neither carrying its build
+toolchain into the published layer, both running unprivileged.
+
+```bash
+cp .env.example .env      # then fill in the PRODUCTION block
+
+docker compose -f docker-compose.prod.yml up --build
+```
+
+**The `prod` profile refuses to start when it is misconfigured, on purpose.** Every secret
+is declared without a fallback, and a validator runs before the first bean is created,
+reporting every missing variable at once by name rather than surfacing later as a driver
+error that names nothing.
+
+It also rejects the two development secrets committed in `application.yml`. Those values
+are in this repository's history permanently, so a deployment using them signs tokens
+anybody can forge and encrypts emotional content to a key anybody can read. Generate your
+own:
+
+```bash
+openssl rand -base64 48   # JWT_SECRET
+openssl rand -base64 32   # ENCRYPTION_KEY (AES-256 — must decode to 32 bytes)
+```
+
+Two details worth knowing before the first deploy:
+
+- **`DATABASE_JDBC_URL`, not `DATABASE_URL`.** Render, Railway and Heroku inject a
+  `DATABASE_URL` of their own in `postgres://user:pass@host/db` form, which is not a JDBC
+  URL. Reusing that name would let the platform silently supply a value the driver cannot
+  parse.
+- **`VITE_API_BASE_URL` is a build argument.** Vite inlines it into the bundle, so pointing
+  the frontend at a different backend means rebuilding its image, not restarting it.
+
+## Pagination
+
+Every listing that grows with use — check-ins, instruments, recommendations, exercise
+completions, wearable readings, conversation messages and the admin user list — returns a
+page rather than an entire history:
+
+```json
+{ "content": [ ... ], "page": 0, "size": 20, "totalElements": 55, "totalPages": 3, "hasNext": true }
+```
+
+`page` defaults to 0 and `size` to 20, capped at 100. The cap is enforced in the domain's
+`PageQuery` constructor rather than in a controller, so it holds for every caller rather
+than only the ones arriving over HTTP — without it, `size=1000000` turns a paginated
+endpoint back into the unbounded one it replaced.
+
+Two listings are deliberately not paginated: the exercise library is a fixed reference table
+of twelve rows, and the wearable insight endpoint returns at most three computed results.
+
+**The data export is never paginated.** Pagination applies to the screens; the copy of their
+own data a person is entitled to has to be complete (ADR-0011), and a test asserts it.
+
+---
+
+## Observability and Rate Limiting
+
+`/actuator/prometheus` exposes the usual JVM, connection-pool, HTTP and Resilience4j series,
+plus three counters this project adds because no library can know what it is for:
+
+| Metric | Answers |
+|---|---|
+| `lumen_risk_event_triggered_total{source}` | Is the crisis path alive, and what is detecting risk? |
+| `lumen_companion_guardrail_blocked_total{layer}` | Are the guardrails actually stopping anything? |
+| `lumen_companion_fallback_served_total` | How often is the language model failing people? |
+
+Every series is registered at zero on startup — a counter that only appears when first
+incremented is indistinguishable from a broken exporter. No metric carries a user id and
+every label comes from an enum: what is measured is that a safety path fired, never whose.
+
+`/actuator/health` stays public because the platform must reach it, probes included.
+`/actuator/prometheus` requires ADMIN: health says up or down, while metrics describe when
+the crisis flow is firing, which in this domain is a picture of when people are in trouble.
+
+Rate limiting covers the two endpoints that need it — authentication (10/min per client
+address) and companion messages (30/hour per user). **The crisis flow is never rate limited,
+at any rate, for any caller.** Someone retrying because a page did not load is the last
+person who should meet a 429. See **[ADR-0012](docs/adr/0012-metrics-and-rate-limiting.md)**.
+
+Buckets are in-memory, so a second instance would allow the full quota again — a known
+boundary, documented rather than discovered.
+
+---
+
+What the `prod` profile changes beyond credentials: Flyway runs only `db/migration`, never
+the dev seed that plants a demo account with a published password; `/actuator/info` is not
+exposed; health details are hidden; and liveness and readiness probes are enabled for the
+platform to poll.
+
+---
+
+## Deploying
+
+`render.yaml` and `frontend/vercel.json` declare the API with its database and the
+frontend; `.github/workflows/deploy.yml` deploys them only after CI passes on `main`,
+rather than letting each platform ship whatever was last pushed. Full walkthrough,
+including the parts that need accounts: **[docs/deployment.md](docs/deployment.md)**.
+
+Two things worth knowing before starting:
+
+- **RabbitMQ is not on Render**, which has no managed broker. Rather than drop the
+  messaging architecture the project exists to demonstrate, point `RABBITMQ_*` at a broker
+  elsewhere. Without one the app still runs and check-ins still save — publishing is
+  best-effort — but the recommendation engine has nothing to consume, so the suggestion
+  feed stays empty.
+- **A free instance sleeps when idle.** The first request after that pays tens of seconds
+  to wake it, during which the frontend looks broken rather than slow.
+
+---
+
 ## Environment Variables
 
-Configuration examples are available in `.env.example`.
+Every variable is documented in `.env.example`, split into a development block and a
+production block.
 
 Never commit real secrets.
 
@@ -387,14 +544,23 @@ Frontend
 ```bash
 npm run lint
 
+npm test
+
 npm run build
 ```
 
 Includes:
 
 - ESLint
+- Vitest + React Testing Library
 - TypeScript type checking
 - Production build
+
+The frontend tests deliberately cover the screens where a UI bug is not cosmetic: the crisis
+screen (every resource reachable, acknowledgment required, never tells the person what they
+are), account deletion (unreachable without typing the confirmation), the consent gate, and
+the themes. One of them reads `index.css` and checks every colour pair against WCAG 2.1 AA —
+it is how the light theme's primary button was found sitting at 3.94:1.
 
 ---
 
@@ -424,9 +590,11 @@ docs/
 | [docs/adr/](docs/adr/) | Architecture Decision Records |
 | [docs/diagrams/c4-context.md](docs/diagrams/c4-context.md) | C4 Context diagram (Mermaid) |
 | [docs/diagrams/c4-container.md](docs/diagrams/c4-container.md) | C4 Container diagram (Mermaid) |
+| [docs/diagrams/c4-component.md](docs/diagrams/c4-component.md) | C4 Component diagram — the clinical-safety path (Mermaid) |
 | [docs/diagrams/domain-model-phase1.md](docs/diagrams/domain-model-phase1.md) | Domain model, Phase 1 (Mermaid) |
 | [docs/diagrams/domain-model-phase4.md](docs/diagrams/domain-model-phase4.md) | Domain model, Exercise/Recommendation (Mermaid) |
 | [docs/diagrams/crisis-flow-state-machine.md](docs/diagrams/crisis-flow-state-machine.md) | Assessment/RiskEvent state machine (Mermaid) |
+| [docs/deployment.md](docs/deployment.md) | How to deploy it, and what needs an account |
 | [docs/threat-model.md](docs/threat-model.md) | Asset → threat → mitigation |
 
 ---
@@ -441,6 +609,12 @@ docs/
 - ✅ Phase 5 — Wearable Integration
 - ✅ Phase 6 — AI Companion & Safety Guardrails
 - ⏳ Phase 7 — Production Readiness & Deployment
+  - ✅ Data-subject rights (export, erasure), OpenAPI contract
+  - ✅ Production images, `prod` profile, compose topology
+  - ✅ Metrics, rate limiting, dark/light themes, frontend tests, C4 complete
+  - ✅ Pagination on every listing that grows with use
+  - ✅ Deployment configuration and CD pipeline
+  - 📋 A live instance (needs platform accounts)
 
 ---
 

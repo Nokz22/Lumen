@@ -18,6 +18,8 @@ import dev.lumen.domain.companion.ConversationSummaryRepository;
 import dev.lumen.domain.companion.LlmClient;
 import dev.lumen.domain.companion.LlmPrompt;
 import dev.lumen.domain.companion.LlmStreamHandler;
+import dev.lumen.domain.observability.GuardrailLayer;
+import dev.lumen.domain.observability.SafetyMetrics;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -36,13 +38,16 @@ class CompanionResponseServiceTest {
     private final ChatOutputVerifier chatOutputVerifier = mock(ChatOutputVerifier.class);
     private final CompanionStreamNotifier companionStreamNotifier = mock(CompanionStreamNotifier.class);
 
+    private final SafetyMetrics safetyMetrics = mock(SafetyMetrics.class);
+
     private final CompanionResponseService service = new CompanionResponseService(
             conversationMessageRepository,
             conversationSummaryRepository,
             conversationContextBuilder,
             llmClient,
             chatOutputVerifier,
-            companionStreamNotifier);
+            companionStreamNotifier,
+            safetyMetrics);
 
     private final UUID userId = UUID.randomUUID();
 
@@ -90,6 +95,35 @@ class CompanionResponseServiceTest {
         verify(conversationMessageRepository).save(any(ConversationMessage.class));
         verify(companionStreamNotifier).sendError(eq(userId), anyString());
         verify(companionStreamNotifier, never()).sendComplete(any(), any());
+    }
+
+    @Test
+    void shouldCountTheFallbackWhenTheLlmCallFails() {
+        errorWith(new IllegalStateException("provider unreachable"));
+
+        service.generateResponseAsync(userId);
+
+        verify(safetyMetrics).companionFallbackServed();
+    }
+
+    @Test
+    void shouldCountTheOutputVerifierBlockWhenAReplyIsSubstituted() {
+        when(chatOutputVerifier.isSafe(anyString())).thenReturn(false);
+        completeWith("a reply the verifier rejects");
+
+        service.generateResponseAsync(userId);
+
+        verify(safetyMetrics).guardrailBlocked(GuardrailLayer.OUTPUT_VERIFIER);
+    }
+
+    @Test
+    void shouldNotCountAGuardrailBlockWhenTheReplyPassesVerification() {
+        when(chatOutputVerifier.isSafe(anyString())).thenReturn(true);
+        completeWith("a perfectly ordinary reply");
+
+        service.generateResponseAsync(userId);
+
+        verify(safetyMetrics, never()).guardrailBlocked(any());
     }
 
     @Test

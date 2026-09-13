@@ -1,7 +1,7 @@
 # Constituição do projeto — Lumen
 
-Constituição do projeto. Lida em cada sessão. Detalhe completo em `docs/`.
-Mantém este ficheiro curto (< 200 linhas) e verificável.
+As regras não-negociáveis do projeto, revistas ao início de cada fase. O detalhe
+completo vive em `docs/`. Este ficheiro fica curto (< 200 linhas) e verificável.
 
 ## O que é
 Lumen é uma plataforma de **bem-estar corpo-mente**. Backend Java 17 + Spring Boot 3;
@@ -15,8 +15,8 @@ substitui cuidado profissional. Apenas adultos (18+).
 - Linguagem: "pontuação de bem-estar", nunca "de depressão". "Registou sentir-se",
   nunca "está". A app descreve o que a pessoa reporta; nunca interpreta clinicamente.
 - Esta regra vive nos textos de UI, nos nomes de campos da API e nos prompts do LLM.
-- Se eu pedir algo que aproxime a app de diagnóstico ou que enfraqueça a segurança,
-  **para e avisa antes de implementar.** "O utilizador pediu" não é justificação.
+- Nada que aproxime a app de diagnóstico ou enfraqueça a segurança clínica entra no
+  projeto, por mais conveniente que seja. "Dava jeito" não é justificação.
 
 ## INVARIANTES CLÍNICOS (sempre verdadeiros, cada um com teste próprio)
 - Uma resposta > 0 ao **item 9 do PHQ-9** cria SEMPRE um RiskEvent e dispara o fluxo
@@ -30,19 +30,18 @@ substitui cuidado profissional. Apenas adultos (18+).
 - Retirar um consentimento desativa a funcionalidade dependente no mesmo ciclo de
   pedido — nunca "eventualmente".
 
-## Como trabalhamos (regras de comportamento)
-- **Uma fase de cada vez.** Segue o plano em `docs/project-brief.md`. Nunca saltes fases.
-- **Plano antes de código.** No início de cada fase, apresenta plano (ficheiros,
-  abordagem, trade-offs) e espera a minha validação antes de escrever nada.
-- **Explica sempre**: porquê assim, que alternativa rejeitaste, qual o trade-off, e
-  como eu defenderia isto numa entrevista. Sou júnior e quero aprender ao construir.
-- **Eu faço os commits.** Sugere a mensagem; o commit é meu. Pequenos e incrementais.
-- **Alterações mínimas.** Não refactorizes o que não pedi. Duas abordagens válidas ->
-  mostra ambas e deixa-me escolher.
-- No fim de cada fase, assume **Staff Engineer em Devil's Advocate** e lista a dívida
-  técnica conscientemente aceite.
+## Método de trabalho
+- **Uma fase de cada vez**, pela ordem do plano em `docs/project-brief.md`. Nenhuma
+  fase é saltada.
+- **Plano antes de código.** Cada fase começa por ficheiros afetados, abordagem e
+  trade-offs — escritos e revistos antes da primeira linha.
+- **Cada decisão fica justificada**: porquê assim, que alternativa foi rejeitada e
+  qual o trade-off. O que não é óbvio vai para o corpo do commit ou para um ADR.
+- **Alterações mínimas.** Nenhum refactor oportunista fora do âmbito da tarefa.
+- No fim de cada fase, uma revisão em modo **Devil's Advocate** (onde é que isto parte
+  daqui a dois anos?) que produz a lista de dívida técnica conscientemente aceite.
 
-## Stack (fixa — não trocar sem me perguntar)
+## Stack (fixa — qualquer troca exige ADR)
 Java 17, Spring Boot 3 (Gradle), PostgreSQL, Flyway, Spring Security + JWT, RabbitMQ,
 WebSocket/STOMP, MapStruct, Testcontainers, JUnit 5, Mockito.
 React 18 + TS strict + Vite, Tailwind, TanStack Query, react-i18next (EN principal, PT-PT opção).

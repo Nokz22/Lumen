@@ -1,5 +1,6 @@
 package dev.lumen.moodcheckin;
 
+import static dev.lumen.support.TestClients.distinctClient;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -24,6 +25,7 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -48,6 +50,9 @@ class MoodCheckInIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    /** Each test signs in as its own client, so they do not share one rate-limit budget. */
+    private final RequestPostProcessor client = distinctClient();
+
     private record AuthenticatedUser(UUID userId, Cookie accessTokenCookie) {
     }
 
@@ -62,6 +67,7 @@ class MoodCheckInIntegrationTest {
 
         MvcResult result = mockMvc.perform(post("/api/v1/auth/register")
                         .with(csrf())
+                        .with(client)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isCreated())
@@ -118,8 +124,8 @@ class MoodCheckInIntegrationTest {
         mockMvc.perform(get("/api/v1/users/{userId}/mood-check-ins", user.userId())
                         .cookie(user.accessTokenCookie()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].emotion").value("ANXIOUS"));
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].emotion").value("ANXIOUS"));
     }
 
     @Test
@@ -133,6 +139,7 @@ class MoodCheckInIntegrationTest {
                 LocalDate.of(1990, 1, 1));
         MvcResult result = mockMvc.perform(post("/api/v1/auth/register")
                         .with(csrf())
+                        .with(client)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isCreated())

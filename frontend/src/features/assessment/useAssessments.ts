@@ -5,10 +5,13 @@ import type { AssessmentType } from '../../types/assessment'
 
 const assessmentHistoryKey = (userId: string) => ['assessments', userId]
 
+/** Instruments are monthly, so a page of twelve is a year of them. */
+const ASSESSMENT_PAGE_SIZE = 12
+
 export function useAssessmentHistory(userId: string) {
   return useQuery({
     queryKey: assessmentHistoryKey(userId),
-    queryFn: () => fetchAssessmentHistory(userId),
+    queryFn: () => fetchAssessmentHistory(userId, { size: ASSESSMENT_PAGE_SIZE }),
   })
 }
 

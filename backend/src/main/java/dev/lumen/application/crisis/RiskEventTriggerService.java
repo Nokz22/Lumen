@@ -5,6 +5,7 @@ import dev.lumen.domain.audit.AuditAction;
 import dev.lumen.domain.crisis.CrisisResourceRepository;
 import dev.lumen.domain.crisis.RiskEvent;
 import dev.lumen.domain.crisis.RiskEventRepository;
+import dev.lumen.domain.observability.SafetyMetrics;
 import dev.lumen.domain.crisis.TriggerSource;
 import java.util.List;
 import java.util.UUID;
@@ -25,14 +26,17 @@ public class RiskEventTriggerService {
     private final RiskEventRepository riskEventRepository;
     private final CrisisResourceRepository crisisResourceRepository;
     private final AuditLogService auditLogService;
+    private final SafetyMetrics safetyMetrics;
 
     public RiskEventTriggerService(
             RiskEventRepository riskEventRepository,
             CrisisResourceRepository crisisResourceRepository,
-            AuditLogService auditLogService) {
+            AuditLogService auditLogService,
+            SafetyMetrics safetyMetrics) {
         this.riskEventRepository = riskEventRepository;
         this.crisisResourceRepository = crisisResourceRepository;
         this.auditLogService = auditLogService;
+        this.safetyMetrics = safetyMetrics;
     }
 
     @Transactional
@@ -41,6 +45,7 @@ public class RiskEventTriggerService {
         riskEvent.presentResources();
         riskEvent = riskEventRepository.save(riskEvent);
         auditLogService.record(userId, userId, AuditAction.CRISIS_FLOW_TRIGGERED);
+        safetyMetrics.riskEventTriggered(triggerSource);
 
         List<CrisisResourceResponse> resources = crisisResourceRepository.findByRegion(region).stream()
                 .map(resource -> new CrisisResourceResponse(

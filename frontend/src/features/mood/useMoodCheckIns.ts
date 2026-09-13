@@ -2,12 +2,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { fetchMoodHistory, submitMoodCheckIn } from '../../api/moodCheckIns'
 import type { MoodCheckInRequest } from '../../types/mood'
 
-const moodHistoryKey = (userId: string) => ['mood-check-ins', userId]
+const moodHistoryKey = (userId: string, size: number) => ['mood-check-ins', userId, size]
 
-export function useMoodHistory(userId: string) {
+export function useMoodHistory(userId: string, size: number) {
   return useQuery({
-    queryKey: moodHistoryKey(userId),
-    queryFn: () => fetchMoodHistory(userId),
+    queryKey: moodHistoryKey(userId, size),
+    queryFn: () => fetchMoodHistory(userId, { size }),
   })
 }
 
@@ -17,7 +17,7 @@ export function useSubmitMoodCheckIn(userId: string) {
   return useMutation({
     mutationFn: (payload: MoodCheckInRequest) => submitMoodCheckIn(userId, payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: moodHistoryKey(userId) })
+      queryClient.invalidateQueries({ queryKey: ['mood-check-ins', userId] })
     },
   })
 }

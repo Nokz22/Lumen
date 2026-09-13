@@ -1,0 +1,86 @@
+# Production topology. Unlike docker-compose.yml — which only starts the dependencies so
+# the apps can run from an IDE — this builds and runs everything, and nothing here has a
+# default credential: every value comes from the environment and the stack refuses to
+# start without it.
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?set POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+    volumes:
+      - lumen-postgres-data:/var/lib/postgresql/data
+    # Not published to the host: the only thing that needs the database is the backend,
+    # and it reaches it over the compose network.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  rabbitmq:
+    image: rabbitmq:3-alpine
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:?set RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:?set RABBITMQ_DEFAULT_PASS}
+    volumes:
+      - lumen-rabbitmq-data:/var/lib/rabbitmq
+    # The management plugin image is a development convenience; production runs the
+    # plain broker so the management UI is not a port waiting to be found.
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DATABASE_JDBC_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      DATABASE_USERNAME: ${POSTGRES_USER}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USERNAME: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_PASSWORD: ${RABBITMQ_DEFAULT_PASS}
+      JWT_SECRET: ${JWT_SECRET:?generate one, never reuse the value committed in application.yml}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:?generate one, never reuse the value committed in application.yml}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:?set the frontend origin}
+      LLM_PROVIDER: ${LLM_PROVIDER:-mock}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+    healthcheck:
+      # The readiness probe, not the liveness one: this decides when the container is
+      # ready to take traffic, and readiness is the probe that waits for the database.
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health/readiness"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # Baked into the bundle at build time (Vite inlines it), so changing where the
+        # frontend points means rebuilding the image, not restarting it.
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:?set the public URL of the backend}
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"
+
+volumes:
+  lumen-postgres-data:
+  lumen-rabbitmq-data:

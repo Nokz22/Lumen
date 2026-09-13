@@ -334,15 +334,16 @@ cobertura, CI/CD, roadmap.
 ## 13. RITUAIS POR FASE (custo zero, sinal alto)
 
 **Antes de cada fase — Tech Lead Review:** riscos, trade-offs, complexidade,
-alternativas, impacto futuro. Só depois implementa (combina com o Plan Mode).
+alternativas, impacto futuro, escritos antes de existir código.
 
-**Depois de cada fase — Devil's Advocate:** o agente assume um Staff Engineer que
-discorda — onde parte em 2 anos? o que está acoplado/complexo demais? o que foi cedo
-demais? onde violamos YAGNI? Saída: lista de **dívida técnica conscientemente aceite**.
-(Isto substitui scorecards de auto-notas, que são anti-sinal.)
+**Depois de cada fase — Devil's Advocate:** a fase é relida na perspetiva de um Staff
+Engineer que discorda — onde parte em 2 anos? o que está acoplado/complexo demais? o
+que foi feito cedo demais? onde violamos YAGNI? Saída: lista de **dívida técnica
+conscientemente aceite**. (Isto substitui scorecards de auto-notas, que são anti-sinal.)
 
-**Transversal — Engineering Learning:** para cada decisão, o agente explica porquê,
-porque não a alternativa, o trade-off, e como eu a defenderia numa entrevista.
+**Transversal — Engineering Learning:** cada decisão fica registada com o porquê, a
+alternativa rejeitada e o trade-off — no corpo do commit quando é local, num ADR
+quando é estrutural.
 
 ---
 

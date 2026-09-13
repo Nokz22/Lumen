@@ -4,10 +4,10 @@ import dev.lumen.application.consent.ConsentService;
 import dev.lumen.application.crisis.CrisisTriggerOutcome;
 import dev.lumen.application.crisis.RiskEventTriggerService;
 import dev.lumen.domain.assessment.Assessment;
-import dev.lumen.domain.assessment.AssessmentNotFoundException;
-import dev.lumen.domain.assessment.AssessmentRepository;
 import dev.lumen.domain.assessment.AssessmentAnswer;
 import dev.lumen.domain.assessment.AssessmentAnswerRepository;
+import dev.lumen.domain.assessment.AssessmentNotFoundException;
+import dev.lumen.domain.assessment.AssessmentRepository;
 import dev.lumen.domain.assessment.AssessmentScore;
 import dev.lumen.domain.assessment.AssessmentScoreRepository;
 import dev.lumen.domain.assessment.AssessmentTooSoonException;
@@ -15,6 +15,8 @@ import dev.lumen.domain.assessment.AssessmentType;
 import dev.lumen.domain.assessment.InvalidAssessmentSubmissionException;
 import dev.lumen.domain.assessment.WellbeingBand;
 import dev.lumen.domain.crisis.TriggerSource;
+import dev.lumen.domain.shared.PageQuery;
+import dev.lumen.domain.shared.PagedResult;
 import dev.lumen.domain.user.ConsentRequiredException;
 import dev.lumen.domain.user.ConsentType;
 import dev.lumen.domain.user.User;
@@ -95,13 +97,13 @@ public class AssessmentService {
     }
 
     @Transactional(readOnly = true)
-    public List<AssessmentSummaryResponse> getHistory(UUID userId) {
+    public PagedResult<AssessmentSummaryResponse> getHistory(UUID userId, PageQuery pageQuery) {
         if (userRepository.findById(userId).isEmpty()) {
             throw new UserNotFoundException(userId);
         }
-        return assessmentRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
-                .map(this::toSummary)
-                .toList();
+        return assessmentRepository
+                .findPageByUserIdOrderByCreatedAtDesc(userId, pageQuery)
+                .map(this::toSummary);
     }
 
     private List<AssessmentAnswer> persistResponses(Assessment assessment, List<Integer> responses) {

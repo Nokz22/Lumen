@@ -9,6 +9,8 @@ import dev.lumen.domain.companion.ConversationSummaryRepository;
 import dev.lumen.domain.companion.LlmClient;
 import dev.lumen.domain.companion.LlmPrompt;
 import dev.lumen.domain.companion.LlmStreamHandler;
+import dev.lumen.domain.observability.GuardrailLayer;
+import dev.lumen.domain.observability.SafetyMetrics;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +41,7 @@ public class CompanionResponseService {
     private final LlmClient llmClient;
     private final ChatOutputVerifier chatOutputVerifier;
     private final CompanionStreamNotifier companionStreamNotifier;
+    private final SafetyMetrics safetyMetrics;
 
     public CompanionResponseService(
             ConversationMessageRepository conversationMessageRepository,
@@ -46,13 +49,15 @@ public class CompanionResponseService {
             ConversationContextBuilder conversationContextBuilder,
             LlmClient llmClient,
             ChatOutputVerifier chatOutputVerifier,
-            CompanionStreamNotifier companionStreamNotifier) {
+            CompanionStreamNotifier companionStreamNotifier,
+            SafetyMetrics safetyMetrics) {
         this.conversationMessageRepository = conversationMessageRepository;
         this.conversationSummaryRepository = conversationSummaryRepository;
         this.conversationContextBuilder = conversationContextBuilder;
         this.llmClient = llmClient;
         this.chatOutputVerifier = chatOutputVerifier;
         this.companionStreamNotifier = companionStreamNotifier;
+        this.safetyMetrics = safetyMetrics;
     }
 
     @Async
@@ -81,7 +86,11 @@ public class CompanionResponseService {
     }
 
     private void finalizeResponse(UUID userId, String fullText) {
-        String safeText = chatOutputVerifier.isSafe(fullText) ? fullText : ChatOutputVerifier.SAFE_FALLBACK_MESSAGE;
+        boolean safe = chatOutputVerifier.isSafe(fullText);
+        if (!safe) {
+            safetyMetrics.guardrailBlocked(GuardrailLayer.OUTPUT_VERIFIER);
+        }
+        String safeText = safe ? fullText : ChatOutputVerifier.SAFE_FALLBACK_MESSAGE;
 
         for (String word : safeText.split(" ")) {
             companionStreamNotifier.sendChunk(userId, word + " ");
@@ -95,6 +104,7 @@ public class CompanionResponseService {
 
     private void handleError(UUID userId, Throwable error) {
         LOG.error("Companion LLM call failed for a conversation turn", error);
+        safetyMetrics.companionFallbackServed();
         conversationMessageRepository.save(
                 new ConversationMessage(userId, ConversationRole.ASSISTANT, LLM_UNAVAILABLE_FALLBACK));
         companionStreamNotifier.sendError(userId, LLM_UNAVAILABLE_FALLBACK);

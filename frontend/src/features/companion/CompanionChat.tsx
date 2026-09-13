@@ -123,13 +123,13 @@ export function CompanionChat() {
         </p>
       )}
 
-      {history && history.length === 0 && !isAwaitingReply && (
+      {history && history.totalElements === 0 && !isAwaitingReply && (
         <p className="text-sm text-[var(--color-text-muted)]">{t('companion.history.empty')}</p>
       )}
 
       {history && (
         <ul role="list" aria-live="polite" className="flex flex-col gap-3">
-          {history.map((message) => (
+          {history.content.map((message) => (
             <li
               key={message.id}
               className={

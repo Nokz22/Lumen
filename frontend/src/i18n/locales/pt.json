@@ -29,7 +29,8 @@
     "loading": "A carregar o teu histórico…",
     "loggedFeeling": "Registaste sentir-te {{emotion}}",
     "energy": "Energia {{level}}/5",
-    "sleep": "{{hours}}h de sono, qualidade {{quality}}/5"
+    "sleep": "{{hours}}h de sono, qualidade {{quality}}/5",
+    "showingRecent": "A mostrar os teus últimos {{shown}} check-ins de {{total}}."
   },
   "language": {
     "en": "EN",
@@ -37,7 +38,8 @@
   },
   "nav": {
     "dashboard": "Painel",
-    "companion": "Companheiro"
+    "companion": "Companheiro",
+    "privacy": "Privacidade"
   },
   "auth": {
     "login": {
@@ -165,7 +167,8 @@
       "title": "Sugerido para ti",
       "loading": "A carregar as tuas sugestões…",
       "empty": "Ainda não há sugestões — vão aparecer aqui depois de um check-in.",
-      "error": "Não foi possível carregar as tuas sugestões. Tenta novamente."
+      "error": "Não foi possível carregar as tuas sugestões. Tenta novamente.",
+      "showingRecent": "A mostrar as {{shown}} sugestões mais recentes de {{total}}."
     }
   },
   "wearable": {
@@ -203,5 +206,49 @@
     "inputPlaceholder": "Escreve uma mensagem…",
     "send": "Enviar",
     "sendError": "Não foi possível enviar a tua mensagem. Tenta novamente."
+  },
+  "privacy": {
+    "title": "Privacidade e os teus dados",
+    "subtitle": "O que o Lumen guarda sobre ti, o que pode fazer com isso, e como voltar a ter tudo contigo.",
+    "consents": {
+      "title": "Consentimentos",
+      "description": "Cada finalidade é separada e todas podem ser retiradas. Retirar suspende essa funcionalidade — o resto do Lumen continua a funcionar, e nada do que já registaste é apagado.",
+      "loading": "A verificar…",
+      "error": "Não foi possível carregar esta definição.",
+      "grant": "Conceder",
+      "revoke": "Retirar",
+      "HEALTH_DATA_PROCESSING": {
+        "title": "Dados de bem-estar",
+        "description": "Permite registar humor, energia e sono, e ver o teu próprio histórico. Sem isto, os check-ins ficam suspensos."
+      },
+      "LLM_PROCESSING": {
+        "title": "Companheiro com IA",
+        "description": "Envia as tuas mensagens de conversa a um modelo de linguagem de terceiros. Sem isto, o companheiro fica indisponível e o resto do Lumen não é afetado."
+      },
+      "WEARABLE_INGESTION": {
+        "title": "Sinais de wearable",
+        "description": "Permite ao Lumen receber frequência cardíaca, HRV, sono e passos, e relacioná-los com o que reportas. Sem isto, nenhum dado fisiológico é guardado."
+      }
+    },
+    "export": {
+      "title": "Descarregar os teus dados",
+      "description": "Tudo o que o Lumen guarda sobre ti num único ficheiro JSON — check-ins, respostas e pontuações dos questionários, recomendações, leituras de wearable e a tua conversa. Disponível estejam ou não os consentimentos ativos.",
+      "submit": "Descarregar",
+      "pending": "A preparar o ficheiro…",
+      "success": "O teu ficheiro foi descarregado.",
+      "error": "Não foi possível preparar o ficheiro. Tenta novamente."
+    },
+    "erase": {
+      "title": "Eliminar a tua conta",
+      "description": "Elimina permanentemente a tua conta e todos os dados associados. Não pode ser revertido, e não há período de recuperação.",
+      "confirmationLabel": "Escreve {{phrase}} para confirmar",
+      "submit": "Eliminar a minha conta",
+      "pending": "A eliminar…",
+      "error": "Não foi possível eliminar a tua conta. Tenta novamente."
+    }
+  },
+  "theme": {
+    "switchToLight": "Mudar para tema claro",
+    "switchToDark": "Mudar para tema escuro"
   }
 }

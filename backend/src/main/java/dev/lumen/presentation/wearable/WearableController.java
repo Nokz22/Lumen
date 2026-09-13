@@ -3,8 +3,11 @@ package dev.lumen.presentation.wearable;
 import dev.lumen.application.wearable.WearableIngestionService;
 import dev.lumen.application.wearable.WearableReadingItem;
 import dev.lumen.application.wearable.WearableReadingResponse;
+import dev.lumen.presentation.shared.PageParameters;
+import dev.lumen.presentation.shared.PageResponse;
 import dev.lumen.presentation.wearable.dto.IngestWearableReadingsRequest;
 import dev.lumen.presentation.wearable.dto.SimulateWearableReadingsRequest;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -16,6 +19,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(
+        name = "Wearable ingestion",
+        description = "Normalized physiological time-series in UTC, provider-agnostic (ADR-0008). Requires"
+                + " WEARABLE_INGESTION consent.")
 @RestController
 @RequestMapping("/api/v1/users/{userId}/wearable-readings")
 @PreAuthorize("#userId == authentication.principal.userId()")
@@ -43,7 +50,8 @@ public class WearableController {
     }
 
     @GetMapping
-    public List<WearableReadingResponse> history(@PathVariable UUID userId) {
-        return wearableIngestionService.getHistory(userId);
+    public PageResponse<WearableReadingResponse> history(
+            @PathVariable UUID userId, PageParameters pageParameters) {
+        return PageResponse.from(wearableIngestionService.getHistory(userId, pageParameters.toPageQuery()));
     }
 }

@@ -2,6 +2,7 @@ package dev.lumen.infrastructure.persistence.crisis;
 
 import dev.lumen.domain.crisis.RiskEvent;
 import dev.lumen.domain.crisis.RiskEventRepository;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Repository;
@@ -23,5 +24,15 @@ class RiskEventRepositoryImpl implements RiskEventRepository {
     @Override
     public Optional<RiskEvent> findById(UUID id) {
         return jpaRepository.findById(id);
+    }
+
+    @Override
+    public List<RiskEvent> findByUserIdOrderByDetectedAtDesc(UUID userId) {
+        return jpaRepository.findByUserIdOrderByDetectedAtDesc(userId);
+    }
+
+    @Override
+    public void deleteByUserId(UUID userId) {
+        jpaRepository.deleteByUserId(userId);
     }
 }

@@ -3,7 +3,10 @@ package dev.lumen.infrastructure.persistence.exercise;
 import dev.lumen.domain.exercise.ExerciseCompletion;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -11,4 +14,10 @@ interface SpringDataExerciseCompletionJpaRepository extends JpaRepository<Exerci
 
     @Query("SELECT c FROM ExerciseCompletion c WHERE c.userId = :userId ORDER BY c.completedAt DESC")
     List<ExerciseCompletion> findByUserIdOrderByCompletedAtDesc(@Param("userId") UUID userId);
+
+    @Modifying
+    @Query("DELETE FROM ExerciseCompletion c WHERE c.userId = :userId")
+    void deleteByUserId(@Param("userId") UUID userId);
+
+    Page<ExerciseCompletion> findPageByUserIdOrderByCompletedAtDesc(UUID userId, Pageable pageable);
 }

@@ -4,7 +4,10 @@ import dev.lumen.domain.wearable.WearableReading;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -18,4 +21,10 @@ interface SpringDataWearableReadingJpaRepository extends JpaRepository<WearableR
                     + "ORDER BY r.recordedAt")
     List<WearableReading> findByUserIdAndRecordedAtBetween(
             @Param("userId") UUID userId, @Param("since") Instant since, @Param("until") Instant until);
+
+    @Modifying
+    @Query("DELETE FROM WearableReading w WHERE w.userId = :userId")
+    void deleteByUserId(@Param("userId") UUID userId);
+
+    Page<WearableReading> findPageByUserIdOrderByRecordedAtDesc(UUID userId, Pageable pageable);
 }

@@ -4,14 +4,25 @@ spring:
   profiles:
     active: dev
 
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    # Endpoints grouped by tag rather than by controller class, so the page reads as
+    # the product does (auth, check-in, instruments, crisis, ...) and not as the package tree.
+    tags-sorter: alpha
+    operations-sorter: method
+
 management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,prometheus
   endpoint:
     health:
       show-details: when-authorized
+  metrics:
+    tags:
+      application: lumen
 
 app:
   # Dev-only defaults below — production (Fase 7) MUST override via real environment
@@ -92,3 +103,97 @@ spring:
 app:
   llm:
     provider: mock
+
+---
+# A demo instance: a real deployment whose only difference from production is that every
+# person in it is invented. Same schema, same encryption, same guardrails — DemoDataSeeder
+# fills it with eight weeks of synthetic history so the app can be understood on sight.
+spring:
+  config:
+    activate:
+      on-profile: demo
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:lumen}
+    username: ${POSTGRES_USER:lumen}
+    password: ${POSTGRES_PASSWORD:changeme}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    # Not db/dev-seed: that plants the demo account as a bare row, and the seeder builds
+    # the whole account itself so the free-text fields go through the encrypting converter.
+    locations: classpath:db/migration
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_DEFAULT_USER:lumen}
+    password: ${RABBITMQ_DEFAULT_PASS:changeme}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    # DATABASE_JDBC_URL, not DATABASE_URL: Render, Railway and Heroku all inject a
+    # DATABASE_URL of their own in postgres://user:pass@host/db form, which is not a
+    # JDBC URL. Reusing that name means the platform silently supplies a value the
+    # driver cannot parse. The name says which format is expected.
+    #
+    # Either give the whole URL, or give the parts. The parts exist because a platform
+    # blueprint can wire host/port/name straight from its managed database, while a
+    # single URL has to be assembled and pasted by hand — and hand-assembling a JDBC URL
+    # is the step this variable was named to stop people getting wrong.
+    url: ${DATABASE_JDBC_URL:jdbc:postgresql://${DATABASE_HOST}:${DATABASE_PORT:5432}/${DATABASE_NAME}}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    # Only db/migration. The dev-seed location plants a demo account with a known
+    # password, and inheriting the dev list here would put it in production.
+    locations: classpath:db/migration
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        # No /actuator/info in production: it is unauthenticated (SecurityConfig) and
+        # exists to describe the build, which is free reconnaissance for no benefit.
+        # /actuator/prometheus is exposed but requires authentication — it is the one
+        # actuator endpoint that describes real traffic.
+        include: health,prometheus
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
+
+# Behind the platform's proxy the socket address is the proxy's, so every caller would
+# share one rate-limit bucket. This makes Spring apply the forwarded headers the proxy
+# sets, which is why the rate limiter reads getRemoteAddr() instead of trusting an
+# X-Forwarded-For header itself — a header a client can set is a key a client can choose.
+server:
+  forward-headers-strategy: framework
+
+app:
+  # Every one of these is deliberately written without a fallback. An unresolvable
+  # placeholder stops the application from starting, which is the only acceptable
+  # failure mode: a production instance that boots with the dev secret committed in
+  # this repository is one that anyone reading the repository can forge tokens for.
+  jwt:
+    secret: ${JWT_SECRET}
+  encryption:
+    key: ${ENCRYPTION_KEY}
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS}

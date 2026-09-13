@@ -24,4 +24,9 @@ class AssessmentAnswerRepositoryImpl implements AssessmentAnswerRepository {
     public List<AssessmentAnswer> findByAssessmentId(UUID assessmentId) {
         return jpaRepository.findByAssessmentId(assessmentId);
     }
+
+    @Override
+    public void deleteByUserId(UUID userId) {
+        jpaRepository.deleteByUserId(userId);
+    }
 }

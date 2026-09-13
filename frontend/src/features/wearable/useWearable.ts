@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { fetchWearableInsights, simulateWearableReadings } from '../../api/wearable'
-import { fetchWearableConsent, grantWearableConsent } from '../../api/wearableConsent'
+import { fetchConsent, grantConsent } from '../../api/consents'
 
 const wearableConsentKey = (userId: string) => ['wearable-consent', userId]
 const wearableInsightsKey = (userId: string) => ['wearable-insights', userId]
@@ -8,7 +8,7 @@ const wearableInsightsKey = (userId: string) => ['wearable-insights', userId]
 export function useWearableConsent(userId: string) {
   return useQuery({
     queryKey: wearableConsentKey(userId),
-    queryFn: () => fetchWearableConsent(userId),
+    queryFn: () => fetchConsent(userId, 'WEARABLE_INGESTION'),
   })
 }
 
@@ -16,7 +16,7 @@ export function useGrantWearableConsent(userId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: () => grantWearableConsent(userId),
+    mutationFn: () => grantConsent(userId, 'WEARABLE_INGESTION'),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: wearableConsentKey(userId) })
     },

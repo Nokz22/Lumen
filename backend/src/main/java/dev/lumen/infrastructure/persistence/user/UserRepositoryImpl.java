@@ -1,7 +1,10 @@
 package dev.lumen.infrastructure.persistence.user;
 
+import dev.lumen.domain.shared.PageQuery;
+import dev.lumen.domain.shared.PagedResult;
 import dev.lumen.domain.user.User;
 import dev.lumen.domain.user.UserRepository;
+import dev.lumen.infrastructure.persistence.shared.SpringDataPaging;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,5 +38,16 @@ class UserRepositoryImpl implements UserRepository {
     @Override
     public User save(User user) {
         return jpaRepository.save(user);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        jpaRepository.deleteById(id);
+    }
+
+    @Override
+    public PagedResult<User> findPageOrderedByCreatedAt(PageQuery pageQuery) {
+        return SpringDataPaging.toPagedResult(
+                jpaRepository.findAllByOrderByCreatedAtAsc(SpringDataPaging.toPageable(pageQuery)));
     }
 }

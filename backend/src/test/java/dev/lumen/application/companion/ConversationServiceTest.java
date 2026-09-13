@@ -3,6 +3,7 @@ package dev.lumen.application.companion;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -14,6 +15,8 @@ import dev.lumen.application.crisis.CrisisTriggerOutcome;
 import dev.lumen.application.crisis.RiskEventTriggerService;
 import dev.lumen.domain.companion.ConversationMessage;
 import dev.lumen.domain.companion.ConversationMessageRepository;
+import dev.lumen.domain.observability.GuardrailLayer;
+import dev.lumen.domain.observability.SafetyMetrics;
 import dev.lumen.domain.user.ConsentRequiredException;
 import dev.lumen.domain.user.ConsentType;
 import dev.lumen.domain.user.Role;
@@ -46,13 +49,16 @@ class ConversationServiceTest {
     private final RiskEventTriggerService riskEventTriggerService = mock(RiskEventTriggerService.class);
     private final CompanionResponseService companionResponseService = mock(CompanionResponseService.class);
 
+    private final SafetyMetrics safetyMetrics = mock(SafetyMetrics.class);
+
     private final ConversationService service = new ConversationService(
             conversationMessageRepository,
             userRepository,
             consentService,
             chatRiskClassifier,
             riskEventTriggerService,
-            companionResponseService);
+            companionResponseService,
+            safetyMetrics);
 
     private final UUID userId = UUID.randomUUID();
     private User user;
@@ -110,6 +116,32 @@ class ConversationServiceTest {
         assertThat(result).isInstanceOf(ConversationCrisisResult.class);
         verify(riskEventTriggerService).trigger(any(), any(), any(), any());
         verify(companionResponseService, never()).generateResponseAsync(any());
+    }
+
+    /**
+     * The counter is the only way anyone outside a database sees that the safety path ran,
+     * so it has to move on exactly the event it claims to describe.
+     */
+    @Test
+    void shouldCountTheInputClassifierBlockWhenRiskIsDetected() {
+        when(consentService.isActive(userId, ConsentType.LLM_PROCESSING)).thenReturn(true);
+        when(chatRiskClassifier.isHighRisk(anyString())).thenReturn(true);
+        when(riskEventTriggerService.trigger(any(), any(), any(), any()))
+                .thenReturn(new CrisisTriggerOutcome(UUID.randomUUID(), List.of()));
+
+        service.submitMessage(userId, "a message that trips the classifier");
+
+        verify(safetyMetrics).guardrailBlocked(GuardrailLayer.INPUT_CLASSIFIER);
+    }
+
+    @Test
+    void shouldNotCountAGuardrailBlockWhenNothingWasBlocked() {
+        when(consentService.isActive(userId, ConsentType.LLM_PROCESSING)).thenReturn(true);
+        when(chatRiskClassifier.isHighRisk(anyString())).thenReturn(false);
+
+        service.submitMessage(userId, "an ordinary message");
+
+        verify(safetyMetrics, never()).guardrailBlocked(any());
     }
 
     @Test
