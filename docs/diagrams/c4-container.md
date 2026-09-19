@@ -12,7 +12,7 @@ C4Container
 
     System_Boundary(lumen, "Lumen") {
         Container(spa, "Frontend SPA", "React 18, TypeScript, Vite", "Dashboard, check-in, instrumentos, companheiro, biblioteca de exercícios")
-        Container(api, "API Backend", "Java 17, Spring Boot 3", "REST (Presentation → Application → Domain), autenticação JWT, guardrails do companheiro")
+        Container(api, "API Backend", "Java 17, Spring Boot 4", "REST (Presentation → Application → Domain), autenticação JWT, guardrails do companheiro")
         Container(ws, "WebSocket/STOMP", "Spring Messaging", "Push em tempo real: recomendações, streaming do companheiro")
         ContainerDb(db, "PostgreSQL", "Flyway-managed", "Dados de domínio; campos sensíveis cifrados (AES-GCM) em repouso")
         Container(mq, "RabbitMQ", "Fila + DLQ", "Eventos de check-in → motor de recomendação, consumidor idempotente")

@@ -6,7 +6,7 @@ import dev.lumen.infrastructure.ratelimit.RateLimiter;
 import dev.lumen.infrastructure.security.CsrfCookieFilter;
 import dev.lumen.infrastructure.security.JwtAuthenticationFilter;
 import dev.lumen.infrastructure.security.StatelessSecurityContextRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;

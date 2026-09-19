@@ -7,15 +7,15 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.config.RetryInterceptorBuilder;
+import org.springframework.amqp.rabbit.config.StatelessRetryOperationsInterceptor;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.retry.RejectAndDontRequeueRecoverer;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.retry.interceptor.RetryOperationsInterceptor;
 
 /**
  * Topology + retry policy for the check-in -> recommendation flow. Queue is bound to a
@@ -25,7 +25,12 @@ import org.springframework.retry.interceptor.RetryOperationsInterceptor;
 @Configuration
 public class RabbitMqConfig {
 
-    private static final int MAX_ATTEMPTS = 3;
+    /**
+     * Two retries after the first delivery, so three deliveries in total. Spring Framework 7
+     * counts retries rather than attempts, which is one fewer than the number it looks like.
+     */
+    private static final int MAX_RETRIES = 2;
+
     private static final int INITIAL_BACKOFF_MS = 500;
     private static final double BACKOFF_MULTIPLIER = 2.0;
     private static final int MAX_BACKOFF_MS = 5000;
@@ -69,7 +74,7 @@ public class RabbitMqConfig {
 
     @Bean
     MessageConverter jsonMessageConverter() {
-        return new Jackson2JsonMessageConverter();
+        return new JacksonJsonMessageConverter();
     }
 
     @Bean
@@ -91,9 +96,9 @@ public class RabbitMqConfig {
         return factory;
     }
 
-    private RetryOperationsInterceptor retryInterceptor() {
+    private StatelessRetryOperationsInterceptor retryInterceptor() {
         return RetryInterceptorBuilder.stateless()
-                .maxAttempts(MAX_ATTEMPTS)
+                .maxRetries(MAX_RETRIES)
                 .backOffOptions(INITIAL_BACKOFF_MS, BACKOFF_MULTIPLIER, MAX_BACKOFF_MS)
                 .recoverer(new RejectAndDontRequeueRecoverer())
                 .build();
