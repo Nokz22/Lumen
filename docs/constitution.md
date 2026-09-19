@@ -4,7 +4,7 @@ As regras não-negociáveis do projeto, revistas ao início de cada fase. O deta
 completo vive em `docs/`. Este ficheiro fica curto (< 200 linhas) e verificável.
 
 ## O que é
-Lumen é uma plataforma de **bem-estar corpo-mente**. Backend Java 17 + Spring Boot 3;
+Lumen é uma plataforma de **bem-estar corpo-mente**. Backend Java 17 + Spring Boot 4;
 frontend React 18 + TypeScript. Projeto de portfólio: código ao nível de produção, e
 eu tenho de saber defender cada decisão numa entrevista técnica. A minha formação em
 Psicologia é o diferencial — a segurança clínica é a prioridade número um.
@@ -42,7 +42,7 @@ substitui cuidado profissional. Apenas adultos (18+).
   daqui a dois anos?) que produz a lista de dívida técnica conscientemente aceite.
 
 ## Stack (fixa — qualquer troca exige ADR)
-Java 17, Spring Boot 3 (Gradle), PostgreSQL, Flyway, Spring Security + JWT, RabbitMQ,
+Java 17, Spring Boot 4 (Gradle), PostgreSQL, Flyway, Spring Security + JWT, RabbitMQ,
 WebSocket/STOMP, MapStruct, Testcontainers, JUnit 5, Mockito.
 React 18 + TS strict + Vite, Tailwind, TanStack Query, react-i18next (EN principal, PT-PT opção).
 Docker, GitHub Actions. LLM (Fase 6) atrás da interface `LlmClient`.

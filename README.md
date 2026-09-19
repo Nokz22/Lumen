@@ -188,6 +188,7 @@ The reasoning behind every non-obvious choice is written down as it's made, not 
 | [0010](docs/adr/0010-llm-guardrails-three-layer-defense.md) | Three-layer LLM defense — safety is never delegated to the model itself |
 | [0011](docs/adr/0011-data-subject-rights-export-and-erasure.md) | Data-subject rights — export is not gated on consent, erasure is real deletion |
 | [0012](docs/adr/0012-metrics-and-rate-limiting.md) | Metrics and rate limiting — and the crisis flow that is never rate limited |
+| [0013](docs/adr/0013-spring-boot-4-e-gradle-9.md) | Spring Boot 4 and Gradle 9 — what a major costs when Jackson changes underneath |
 
 Full list, including infrastructure-level decisions (Flyway, MapStruct): **[docs/adr/](docs/adr/)**.
 
@@ -198,7 +199,7 @@ Full list, including infrastructure-level decisions (Flyway, MapStruct): **[docs
 ### Backend
 
 - Java 17
-- Spring Boot 3
+- Spring Boot 4
 - Spring Security
 - JWT Authentication
 - PostgreSQL
@@ -266,7 +267,7 @@ C4Container
 
     System_Boundary(lumen, "Lumen") {
         Container(spa, "Frontend SPA", "React 18, TypeScript, Vite", "Dashboard, check-in, instruments, companion, exercise library")
-        Container(api, "API Backend", "Java 17, Spring Boot 3", "REST (Presentation → Application → Domain), JWT auth, companion guardrails")
+        Container(api, "API Backend", "Java 17, Spring Boot 4", "REST (Presentation → Application → Domain), JWT auth, companion guardrails")
         Container(ws, "WebSocket/STOMP", "Spring Messaging", "Real-time push: recommendations, companion streaming")
         ContainerDb(db, "PostgreSQL", "Flyway-managed", "Domain data; sensitive fields encrypted (AES-GCM) at rest")
         Container(mq, "RabbitMQ", "Queue + DLQ", "Check-in events → recommendation engine, idempotent consumer")
