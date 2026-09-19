@@ -51,18 +51,33 @@ jobs:
         if: failure()
         run: |
           python3 - <<'PY'
+          import collections
           import glob
+          import re
           import xml.etree.ElementTree as ET
 
+          groups = collections.defaultdict(list)
           for path in sorted(glob.glob('build/test-results/test/*.xml')):
               for case in ET.parse(path).getroot().iter('testcase'):
                   for kind in ('failure', 'error'):
                       node = case.find(kind)
                       if node is None:
                           continue
-                      print(f"{case.get('classname')} > {case.get('name')} [{kind}]")
-                      print((node.get('message') or '').strip()[:600])
-                      print('-' * 72)
+                      body = node.text or ''
+                      # The last "Caused by" is the root cause; the message alone is
+                      # usually Spring restating that a context failed to load.
+                      causes = re.findall(r'^Caused by: .*$', body, re.M)
+                      head = (node.get('message') or '').strip().splitlines()
+                      root = causes[-1].strip() if causes else (head[0] if head else kind)
+                      groups[root].append(case.get('classname') + '.' + case.get('name'))
+
+          for root, tests in sorted(groups.items(), key=lambda kv: -len(kv[1])):
+              print(str(len(tests)) + ' failing on: ' + root[:700])
+              for t in tests[:4]:
+                  print('    ' + t)
+              if len(tests) > 4:
+                  print('    ... and ' + str(len(tests) - 4) + ' more')
+              print('-' * 72)
           PY
 
   frontend:
