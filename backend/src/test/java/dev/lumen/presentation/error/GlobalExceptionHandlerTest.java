@@ -2,9 +2,12 @@ package dev.lumen.presentation.error;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import dev.lumen.domain.user.ConsentType;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 class GlobalExceptionHandlerTest {
 
@@ -64,6 +67,29 @@ class GlobalExceptionHandlerTest {
         ProblemDetail problem = handler.handleUnreadableBody();
 
         assertThat(problem.getDetail()).isEqualTo("Malformed request body");
+    }
+
+    /**
+     * A consent type that is not in the enum used to come back as a 500 with a stack trace.
+     * It is the caller's typo in a URL, which is the same defect as the five already mapped.
+     */
+    @Test
+    void shouldMapAnUnconvertibleEnumInTheUrlToBadRequestRatherThanServerError() {
+        ProblemDetail problem = handler.handleUnconvertibleArgument(
+                new MethodArgumentTypeMismatchException("HEALTH_DATA", ConsentType.class, "consentType", null, null));
+
+        assertThat(problem.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(problem.getDetail()).contains("consentType").contains("HEALTH_DATA_PROCESSING");
+    }
+
+    /** The rejected value arrives in the URL, so echoing it would reflect it straight back. */
+    @Test
+    void shouldNotEchoTheRejectedUrlValue() {
+        ProblemDetail problem = handler.handleUnconvertibleArgument(
+                new MethodArgumentTypeMismatchException(
+                        "<script>alert(1)</script>", ConsentType.class, "consentType", null, null));
+
+        assertThat(problem.getDetail()).doesNotContain("script");
     }
 
     @Test

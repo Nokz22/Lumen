@@ -13,6 +13,7 @@ import dev.lumen.domain.user.ConsentRequiredException;
 import dev.lumen.domain.user.EmailAlreadyRegisteredException;
 import dev.lumen.domain.user.UnderageRegistrationException;
 import dev.lumen.domain.user.UserNotFoundException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -28,6 +29,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
@@ -137,20 +139,39 @@ public class GlobalExceptionHandler {
         return ProblemDetail.forStatusAndDetail(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Unsupported content type");
     }
 
-    /**
-     * A body Jackson cannot read is a malformed request, not a broken server. The detail is
-     * deliberately generic: the parser's own message quotes the offending input back, and
-     * the offending input here is a person's questionnaire answers or chat message.
-     */
     /** A page size of 5000 or a negative index is a bad request, not a server problem. */
     @ExceptionHandler(InvalidPageRequestException.class)
     public ProblemDetail handleInvalidPageRequest(InvalidPageRequestException exception) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage());
     }
 
+    /**
+     * A body Jackson cannot read is a malformed request, not a broken server. The detail is
+     * deliberately generic: the parser's own message quotes the offending input back, and
+     * the offending input here is a person's questionnaire answers or chat message.
+     */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ProblemDetail handleUnreadableBody() {
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Malformed request body");
+    }
+
+    /**
+     * A path or query value that will not convert is the caller's mistake, not the server's.
+     * {@code /consents/HEALTH_DATA/grant} reached the catch-all and came back as a 500 with a
+     * stack trace, which is the same defect as the five client errors already mapped here.
+     *
+     * <p>The rejected value is never echoed: it arrives in the URL and would be reflected
+     * straight back. Where the target is an enum the accepted values are listed instead --
+     * they are already public in the OpenAPI document, and they are what the caller needs.
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ProblemDetail handleUnconvertibleArgument(MethodArgumentTypeMismatchException exception) {
+        Class<?> required = exception.getRequiredType();
+        String detail = "'" + exception.getName() + "' is not valid";
+        if (required != null && required.isEnum()) {
+            detail += "; expected one of " + Arrays.toString(required.getEnumConstants());
+        }
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, detail);
     }
 
     @ExceptionHandler(Exception.class)
